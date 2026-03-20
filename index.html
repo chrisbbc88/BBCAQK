@@ -858,14 +858,14 @@
     <div style="padding:20px 22px" id="importBody">
       <!-- Step 1: Upload -->
       <div id="impStep1">
-        <div class="imp-drop" id="impDrop" onclick="document.getElementById('impFileInput').click()"
+        <label for="impFileInput" class="imp-drop" id="impDrop"
           ondragover="event.preventDefault();this.classList.add('drag')"
           ondragleave="this.classList.remove('drag')"
           ondrop="handleDrop(event)">
           <div class="imp-drop-icon"><svg width="32" height="32"><use href="#ic-file-csv"/></svg></div>
           <div class="imp-drop-txt">CSV-Datei auswählen oder hier ablegen</div>
           <div class="imp-drop-sub">Trennzeichen: Semikolon (;) oder Komma (,) · UTF-8</div>
-        </div>
+        </label>
         <input type="file" id="impFileInput" accept=".csv,text/csv" style="display:none" onchange="handleFileSelect(this.files[0])">
         <div id="impFileInfo" style="display:none;margin-top:12px"></div>
       </div>
@@ -1872,9 +1872,9 @@ function renderSettings() {
               <div class="s-backup-icon"><svg width="28" height="28" color="var(--blue)"><use href="#ic-restore"/></svg></div>
               <div class="s-backup-label">Backup wiederherstellen</div>
               <div class="s-backup-desc">JSON-Backup-Datei laden und Daten wiederherstellen</div>
-              <button class="btn btn-ghost" style="width:100%;justify-content:center" onclick="document.getElementById('restoreInput').click()">
+              <label for="restoreInput" class="btn btn-ghost" style="width:100%;justify-content:center;cursor:pointer;display:inline-flex;align-items:center;gap:6px;margin:0">
                 <svg width="13" height="13"><use href="#ic-upload"/></svg> Datei wählen
-              </button>
+              </label>
               <input type="file" id="restoreInput" accept=".json" style="display:none" onchange="restoreBackup(this.files[0])">
             </div>
 
