@@ -1,0 +1,2081 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Akquise Tracker — BBC Digital</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #f5f4f0;
+    --surface:   #ffffff;
+    --surface2:  #f0efe9;
+    --surface3:  #e8e7e0;
+    --border:    #e2e0d8;
+    --border2:   #d0cec4;
+    --text:      #1a1916;
+    --text2:     #6b6860;
+    --text3:     #a09e98;
+    --accent:    #1a5c3a;
+    --accent-lt: #e8f2ec;
+    --accent-md: #b8d9c4;
+    --red:       #c0392b;
+    --red-lt:    #fdf0ee;
+    --red-md:    #f5c6c2;
+    --blue:      #1a3a5c;
+    --blue-lt:   #edf2f8;
+    --blue-md:   #b8cfe0;
+    --amber:     #8a5a00;
+    --amber-lt:  #fdf6e3;
+    --amber-md:  #f0d49a;
+    --violet:    #5a1a7a;
+    --violet-lt: #f4eef8;
+    --violet-md: #d4b8e8;
+    --teal:      #1a6a5a;
+    --teal-lt:   #eaf4f2;
+    --teal-md:   #b8ddd8;
+    --radius:    6px;
+    --radius2:   10px;
+    --shadow:    0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.05);
+    --shadow2:   0 4px 16px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Geist', sans-serif;
+    font-size: 13.5px;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+  .ico { display: inline-block; vertical-align: middle; flex-shrink: 0; }
+  .ico svg { display: block; }
+
+  /* HEADER */
+  .header {
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 0 24px; height: 54px; display: flex; align-items: center; gap: 0;
+    position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow);
+  }
+  .logo { font-family: 'Instrument Serif', serif; font-size: 19px; color: var(--text); letter-spacing: -0.3px; flex-shrink: 0; margin-right: 32px; }
+  .logo em { color: var(--accent); font-style: normal; }
+  .nav { display: flex; gap: 2px; }
+  .nav-btn {
+    background: none; border: none; color: var(--text2); cursor: pointer;
+    padding: 6px 14px; border-radius: var(--radius); font-family: 'Geist', sans-serif;
+    font-size: 13px; font-weight: 500; transition: all 0.13s;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .nav-btn:hover { color: var(--text); background: var(--surface2); }
+  .nav-btn.active { color: var(--accent); background: var(--accent-lt); }
+  .header-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+  .user-toggle {
+    display: flex; align-items: center; gap: 7px;
+    padding: 5px 12px 5px 5px; border-radius: 20px;
+    background: var(--surface2); border: 1px solid var(--border);
+    cursor: pointer; transition: border-color 0.13s;
+    font-size: 12.5px; font-weight: 500; color: var(--text2);
+  }
+  .user-toggle:hover { border-color: var(--border2); color: var(--text); }
+  .avatar { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; font-family: 'Instrument Serif', serif; }
+  .av-c { background: var(--accent-lt); color: var(--accent); }
+  .av-p { background: var(--blue-lt); color: var(--blue); }
+
+  /* LAYOUT */
+  .layout { display: flex; height: calc(100vh - 54px); }
+
+  /* SIDEBAR */
+  .sidebar { width: 232px; background: var(--surface); border-right: 1px solid var(--border); padding: 12px 10px; display: flex; flex-direction: column; gap: 2px; overflow-y: auto; flex-shrink: 0; }
+  .sb-section { font-size: 10px; font-weight: 600; letter-spacing: 1px; color: var(--text3); padding: 10px 10px 4px; text-transform: uppercase; }
+  .sb-item { display: flex; align-items: center; gap: 8px; padding: 7px 10px; border-radius: var(--radius); cursor: pointer; color: var(--text2); font-size: 13px; font-weight: 400; transition: all 0.12s; border: 1px solid transparent; user-select: none; }
+  .sb-item:hover { background: var(--surface2); color: var(--text); }
+  .sb-item.active { background: var(--accent-lt); color: var(--accent); border-color: var(--accent-md); font-weight: 500; }
+  .sb-cnt { margin-left: auto; font-size: 11px; font-family: 'Geist Mono', monospace; background: var(--surface2); color: var(--text3); padding: 1px 7px; border-radius: 10px; }
+  .sb-item.active .sb-cnt { background: var(--accent-md); color: var(--accent); }
+
+  /* MAIN */
+  .main { flex: 1; overflow-y: auto; display: flex; flex-direction: column; min-width: 0; }
+
+  /* STATS */
+  .stats-bar { display: grid; grid-template-columns: repeat(5,1fr); border-bottom: 1px solid var(--border); flex-shrink: 0; background: var(--surface); }
+  .stat-card { padding: 14px 18px; border-right: 1px solid var(--border); }
+  .stat-card:last-child { border-right: none; }
+  .stat-lbl { font-size: 10.5px; color: var(--text3); letter-spacing: 0.5px; text-transform: uppercase; font-weight: 500; margin-bottom: 5px; }
+  .stat-val { font-family: 'Instrument Serif', serif; font-size: 26px; color: var(--text); line-height: 1; }
+  .stat-sub { font-size: 11px; color: var(--text3); margin-top: 3px; }
+  .stat-sub.up { color: var(--teal); font-weight: 500; }
+
+  /* TOOLBAR */
+  .toolbar { padding: 12px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; background: var(--surface); flex-shrink: 0; }
+  .search-wrap { position: relative; flex: 1; max-width: 320px; }
+  .search-wrap input { width: 100%; background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 7px 12px 7px 34px; border-radius: var(--radius); font-family: 'Geist', sans-serif; font-size: 13px; outline: none; transition: border-color 0.13s; }
+  .search-wrap input:focus { border-color: var(--border2); background: var(--surface); }
+  .search-wrap input::placeholder { color: var(--text3); }
+  .s-ico { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text3); pointer-events: none; display: flex; }
+  .btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 15px; border-radius: var(--radius); border: none; cursor: pointer; font-family: 'Geist', sans-serif; font-size: 13px; font-weight: 500; transition: all 0.13s; white-space: nowrap; }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: #144d30; }
+  .btn-ghost { background: var(--surface2); color: var(--text2); border: 1px solid var(--border); }
+  .btn-ghost:hover { background: var(--surface3); color: var(--text); border-color: var(--border2); }
+  .filter-pills { display: flex; gap: 6px; margin-left: auto; }
+  .pill { padding: 4px 11px; border-radius: 20px; font-size: 12px; font-weight: 500; border: 1px solid var(--border); background: none; color: var(--text2); cursor: pointer; transition: all 0.12s; display: inline-flex; align-items: center; gap: 4px; }
+  .pill.active { border-color: var(--accent); color: var(--accent); background: var(--accent-lt); }
+
+  /* TABLE */
+  .table-wrap { flex: 1; overflow-y: auto; }
+  table { width: 100%; border-collapse: collapse; }
+  thead th { padding: 9px 14px; text-align: left; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.7px; color: var(--text3); background: var(--bg); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 10; white-space: nowrap; cursor: pointer; user-select: none; transition: color 0.12s; }
+  thead th:hover { color: var(--text2); }
+  thead th:first-child { padding-left: 20px; }
+  thead th:last-child { padding-right: 20px; }
+  tbody tr { border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.1s; }
+  tbody tr:hover { background: var(--surface2); }
+  tbody tr.sel { background: var(--accent-lt); }
+  tbody td { padding: 11px 14px; vertical-align: middle; }
+  tbody td:first-child { padding-left: 20px; }
+  tbody td:last-child { padding-right: 20px; }
+  .cc-wrap { display: flex; align-items: center; gap: 10px; }
+  .c-av { width: 32px; height: 32px; border-radius: var(--radius); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; font-family: 'Instrument Serif', serif; border: 1px solid var(--border); }
+  .c-name { font-weight: 500; color: var(--text); font-size: 13px; }
+  .c-sub  { font-size: 11px; color: var(--text3); margin-top: 1px; }
+  .ch-badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: 4px; font-size: 11.5px; font-weight: 500; }
+  .ch-li  { background: var(--blue-lt);   color: var(--blue); }
+  .ch-em  { background: var(--amber-lt);  color: var(--amber); }
+  .ch-tel { background: var(--violet-lt); color: var(--violet); }
+  .st-badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: 4px; font-size: 11.5px; font-weight: 500; }
+  .st-badge::before { content:''; width:5px; height:5px; border-radius:50%; background:currentColor; opacity:.65; }
+  .st-neu         { background: var(--surface2);  color: var(--text2); }
+  .st-kontaktiert { background: var(--blue-lt);   color: var(--blue); }
+  .st-antwort     { background: var(--amber-lt);  color: var(--amber); }
+  .st-qualifiziert{ background: var(--accent-lt); color: var(--accent); }
+  .st-angebot     { background: var(--violet-lt); color: var(--violet); }
+  .st-gewonnen    { background: var(--teal-lt);   color: var(--teal); }
+  .st-verloren    { background: var(--red-lt);    color: var(--red); }
+  .pr-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11.5px; font-weight: 500; padding: 3px 9px; border-radius: 4px; }
+  .pr-hoch    { background: var(--red-lt);   color: var(--red); }
+  .pr-mittel  { background: var(--amber-lt); color: var(--amber); }
+  .pr-niedrig { background: var(--surface2); color: var(--text3); }
+  .own-chip { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--text2); }
+  .own-dot { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9.5px; font-weight: 700; font-family: 'Instrument Serif', serif; }
+  .od-c { background: var(--accent-lt); color: var(--accent); }
+  .od-p { background: var(--blue-lt);   color: var(--blue); }
+  .act-cell { display: flex; gap: 4px; opacity: 0; transition: opacity 0.12s; }
+  tr:hover .act-cell { opacity: 1; }
+  .ico-btn { width: 28px; height: 28px; border-radius: var(--radius); background: var(--surface2); border: 1px solid var(--border); color: var(--text2); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.12s; }
+  .ico-btn:hover { background: var(--surface3); border-color: var(--border2); color: var(--text); }
+  .ico-btn.del:hover { background: var(--red-lt); border-color: var(--red-md); color: var(--red); }
+  .date-cell { font-family: 'Geist Mono', monospace; font-size: 12px; color: var(--text3); }
+  .chk input[type=checkbox] { width: 14px; height: 14px; accent-color: var(--accent); cursor: pointer; }
+
+  /* MODAL */
+  .overlay { position: fixed; inset: 0; background: rgba(20,18,15,0.35); backdrop-filter: blur(3px); z-index: 200; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.18s; }
+  .overlay.open { opacity: 1; pointer-events: all; }
+  .modal { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius2); width: 560px; max-width: 95vw; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow2); transform: translateY(16px); transition: transform 0.2s; }
+  .overlay.open .modal { transform: translateY(0); }
+  .modal-hd { padding: 18px 22px 14px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .modal-title { font-family: 'Instrument Serif', serif; font-size: 20px; color: var(--text); }
+  .modal-body { padding: 18px 22px; display: grid; grid-template-columns: 1fr 1fr; gap: 13px; }
+  .ff { grid-column: 1/-1; }
+  .field label { display: block; font-size: 10.5px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 5px; }
+  .field input, .field select, .field textarea { width: 100%; background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 8px 11px; border-radius: var(--radius); font-family: 'Geist', sans-serif; font-size: 13px; outline: none; transition: border-color 0.13s; -webkit-appearance: none; }
+  .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--accent); background: var(--surface); }
+  .field textarea { min-height: 72px; resize: vertical; }
+  .sel-w { position: relative; }
+  .sel-w::after { content:'›'; position:absolute; right:10px; top:50%; transform:translateY(-50%) rotate(90deg); color:var(--text3); pointer-events:none; font-size:14px; }
+  .modal-ft { padding: 14px 22px 18px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 8px; }
+
+  /* DETAIL */
+  .detail-panel { position: fixed; top: 54px; right: 0; bottom: 0; width: 340px; background: var(--surface); border-left: 1px solid var(--border); display: flex; flex-direction: column; overflow-y: auto; z-index: 50; transform: translateX(100%); transition: transform 0.22s cubic-bezier(.4,0,.2,1); box-shadow: -4px 0 16px rgba(0,0,0,0.06); }
+  .detail-panel.open { transform: translateX(0); }
+  .dp-hd { padding: 18px 18px 14px; border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; gap: 11px; }
+  .dp-av { width: 42px; height: 42px; border-radius: var(--radius); display: flex; align-items: center; justify-content: center; font-size: 17px; font-family: 'Instrument Serif', serif; font-weight: 600; flex-shrink: 0; border: 1px solid var(--border); }
+  .dp-name { font-family: 'Instrument Serif', serif; font-size: 17px; color: var(--text); line-height: 1.2; }
+  .dp-sub  { font-size: 12px; color: var(--text3); margin-top: 3px; }
+  .tab-bar { display: flex; border-bottom: 1px solid var(--border); padding: 0 18px; }
+  .tab-item { padding: 9px 14px; font-size: 13px; color: var(--text3); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.12s; font-weight: 500; }
+  .tab-item:hover { color: var(--text2); }
+  .tab-item.active { color: var(--accent); border-color: var(--accent); }
+  .dp-section { padding: 14px 18px; border-bottom: 1px solid var(--border); }
+  .dp-stitle { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text3); margin-bottom: 10px; }
+  .dp-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 7px; }
+  .dp-row:last-child { margin-bottom: 0; }
+  .dp-key { font-size: 12px; color: var(--text3); }
+  .dp-val { font-size: 12px; color: var(--text); font-weight: 500; }
+  .timeline { padding: 14px 18px; }
+  .tl-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text3); margin-bottom: 12px; }
+  .tl-item { display: flex; gap: 10px; margin-bottom: 13px; position: relative; }
+  .tl-item:not(:last-child)::after { content:''; position:absolute; left:13px; top:26px; width:1px; height:calc(100% + 4px); background: var(--border); }
+  .tl-dot { width: 26px; height: 26px; border-radius: 50%; border: 1px solid var(--border); background: var(--surface2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; z-index: 1; }
+  .tl-ev { font-size: 12px; font-weight: 500; color: var(--text); }
+  .tl-dt { font-size: 11px; color: var(--text3); margin-top: 2px; font-family: 'Geist Mono', monospace; }
+  .add-note { padding: 0 18px 18px; }
+  .note-row { display: flex; gap: 7px; }
+  .note-row textarea { flex: 1; background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 7px 10px; border-radius: var(--radius); font-family: 'Geist', sans-serif; font-size: 12.5px; outline: none; resize: none; min-height: 56px; transition: border-color 0.13s; }
+  .note-row textarea:focus { border-color: var(--border2); background: var(--surface); }
+
+  /* ANALYTICS */
+  .analytics-wrap { padding: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .an-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius2); padding: 18px; box-shadow: var(--shadow); }
+  .an-title { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text3); margin-bottom: 14px; }
+  .an-wide { grid-column: 1/-1; }
+  .fn-bar { margin-bottom: 9px; }
+  .fn-lbl { display: flex; justify-content: space-between; margin-bottom: 3px; }
+  .fn-lbl span:first-child { font-size: 12px; color: var(--text2); }
+  .fn-lbl span:last-child { font-size: 12px; color: var(--text); font-weight: 600; font-family: 'Geist Mono', monospace; }
+  .fn-track { height: 5px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
+  .fn-fill { height: 100%; border-radius: 3px; transition: width 0.5s ease; }
+  .team-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .team-stat { text-align: center; padding: 14px 10px; background: var(--surface2); border-radius: var(--radius); }
+  .team-name { font-size: 12px; color: var(--text3); margin-bottom: 6px; font-weight: 500; }
+  .team-num { font-family: 'Instrument Serif', serif; font-size: 34px; line-height: 1; }
+  .team-sub { font-size: 11px; color: var(--text3); margin-top: 4px; }
+  .ch-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+  .ch-stat { text-align: center; padding: 12px 6px; background: var(--surface2); border-radius: var(--radius); }
+  .ch-ico  { margin-bottom: 8px; display: flex; justify-content: center; }
+  .ch-num  { font-family: 'Instrument Serif', serif; font-size: 26px; line-height: 1; }
+  .ch-lbl  { font-size: 11px; color: var(--text3); margin-top: 2px; }
+  .ch-sub  { font-size: 10.5px; color: var(--teal); margin-top: 3px; font-weight: 500; }
+  .wk-bars { display: flex; align-items: flex-end; gap: 5px; height: 72px; }
+  .wk-bar  { flex: 1; border-radius: 3px 3px 0 0; min-width: 0; }
+  .wk-lbls { display: flex; gap: 5px; margin-top: 5px; }
+  .wk-lbl  { flex: 1; text-align: center; font-size: 10px; color: var(--text3); font-family: 'Geist Mono', monospace; }
+
+  /* EMPTY */
+  .empty { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 20px; color: var(--text3); text-align: center; }
+  .empty-ico { margin-bottom: 10px; opacity: 0.25; }
+  .empty-txt { font-size: 13.5px; }
+
+  /* NOTIF */
+  .notif { position: fixed; bottom: 20px; right: 20px; z-index: 500; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 11px 16px; font-size: 13px; color: var(--text); box-shadow: var(--shadow2); transform: translateY(70px); opacity: 0; transition: all 0.25s; }
+  .notif.show { transform: translateY(0); opacity: 1; }
+  .notif.ok  { border-color: var(--accent-md); color: var(--accent); }
+  .notif.err { border-color: var(--red-md);    color: var(--red); }
+
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+  /* CHANNEL CHECKBOXES */
+  .kanal-checks { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 2px; }
+  .kcheck { display: flex; }
+  .kcheck input[type=checkbox] { position: absolute; opacity: 0; width: 0; height: 0; }
+  .kcheck-box {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 13px; border-radius: var(--radius);
+    border: 1px solid var(--border); background: var(--surface2);
+    color: var(--text2); font-size: 13px; font-weight: 500;
+    cursor: pointer; transition: all 0.13s; user-select: none;
+  }
+  .kcheck-box:hover { border-color: var(--border2); color: var(--text); background: var(--surface3); }
+  .kcheck input:checked + .kcheck-box { border-color: var(--accent); background: var(--accent-lt); color: var(--accent); }
+  .kcheck-li input:checked + .kcheck-box  { border-color: var(--blue);   background: var(--blue-lt);   color: var(--blue); }
+  .kcheck-em input:checked + .kcheck-box  { border-color: var(--amber);  background: var(--amber-lt);  color: var(--amber); }
+  .kcheck-tel input:checked + .kcheck-box { border-color: var(--violet); background: var(--violet-lt); color: var(--violet); }
+
+  /* NEXT ACTION QUICK-SELECT */
+  .next-action-wrap { display: flex; flex-direction: column; gap: 6px; }
+  .na-presets { display: flex; gap: 5px; flex-wrap: wrap; }
+  .na-btn {
+    padding: 4px 10px; border-radius: var(--radius); border: 1px solid var(--border);
+    background: var(--surface2); color: var(--text2); font-family: 'Geist', sans-serif;
+    font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.12s;
+  }
+  .na-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-lt); }
+  .na-btn.active { border-color: var(--accent); color: var(--accent); background: var(--accent-lt); font-weight: 600; }
+  .na-date-input { width: 100%; background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 8px 11px; border-radius: var(--radius); font-family: 'Geist', sans-serif; font-size: 13px; outline: none; transition: border-color 0.13s; }
+  .na-date-input:focus { border-color: var(--accent); background: var(--surface); }
+
+  /* MULTI-CHANNEL BADGES in table */
+  .ch-badges { display: flex; gap: 4px; flex-wrap: wrap; }
+
+  /* TAGS */
+  .tag { display: inline-flex; align-items: center; gap: 4px; padding: 2px 9px; border-radius: 20px; font-size: 11px; font-weight: 500; background: var(--surface2); border: 1px solid var(--border); color: var(--text2); white-space: nowrap; }
+  .tag-rm { background: none; border: none; cursor: pointer; color: var(--text3); padding: 0; display: inline-flex; align-items: center; transition: color 0.12s; line-height: 1; }
+  .tag-rm:hover { color: var(--red); }
+  .tags-wrap { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 4px; min-height: 32px; }
+  .tag-input-row { display: flex; gap: 6px; }
+  .tag-input-row input { flex: 1; background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 7px 11px; border-radius: var(--radius); font-family: 'Geist', sans-serif; font-size: 13px; outline: none; transition: border-color 0.13s; }
+  .tag-input-row input:focus { border-color: var(--accent); background: var(--surface); }
+  .tag-suggest { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 5px; }
+  .tag-sug-btn { padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 500; border: 1px dashed var(--border2); background: none; color: var(--text3); cursor: pointer; transition: all 0.12s; }
+  .tag-sug-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-lt); }
+
+  /* TAG colors cycling */
+  .tag:nth-child(6n+1) { background: var(--accent-lt);  border-color: var(--accent-md);  color: var(--accent); }
+  .tag:nth-child(6n+2) { background: var(--blue-lt);    border-color: var(--blue-md);    color: var(--blue); }
+  .tag:nth-child(6n+3) { background: var(--amber-lt);   border-color: var(--amber-md);   color: var(--amber); }
+  .tag:nth-child(6n+4) { background: var(--violet-lt);  border-color: var(--violet-md);  color: var(--violet); }
+  .tag:nth-child(6n+5) { background: var(--teal-lt);    border-color: var(--teal-md);    color: var(--teal); }
+  .tag:nth-child(6n+6) { background: var(--red-lt);     border-color: var(--red-md);     color: var(--red); }
+
+  /* SETTINGS */
+  .settings-wrap { padding: 28px 32px; max-width: 800px; }
+  .settings-page-title { font-family: 'Instrument Serif', serif; font-size: 24px; color: var(--text); margin-bottom: 6px; }
+  .settings-page-sub { font-size: 13px; color: var(--text3); margin-bottom: 28px; }
+  .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .settings-grid.single { grid-template-columns: 1fr; }
+  .s-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius2); overflow: hidden; }
+  .s-card-hd { padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+  .s-card-icon { width: 32px; height: 32px; border-radius: var(--radius); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .s-card-title { font-size: 13.5px; font-weight: 600; color: var(--text); }
+  .s-card-sub { font-size: 11.5px; color: var(--text3); margin-top: 1px; }
+  .s-card-body { padding: 14px 18px; }
+  .s-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; min-height: 32px; }
+  .s-item { display: flex; align-items: center; gap: 8px; padding: 7px 10px; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); font-size: 13px; color: var(--text); transition: border-color 0.12s; }
+  .s-item:hover { border-color: var(--border2); }
+  .s-item-label { flex: 1; font-weight: 500; }
+  .s-item-sub { font-size: 11px; color: var(--text3); }
+  .s-item-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .s-add-row { display: flex; gap: 6px; }
+  .s-add-row input { flex: 1; background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 7px 11px; border-radius: var(--radius); font-family: 'Geist', sans-serif; font-size: 13px; outline: none; transition: border-color 0.13s; }
+  .s-add-row input:focus { border-color: var(--accent); background: var(--surface); }
+  .s-add-row input::placeholder { color: var(--text3); }
+  .s-divider { height: 1px; background: var(--border); margin: 12px 0; }
+  .s-backup-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .s-backup-card { padding: 16px; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); text-align: center; transition: border-color 0.13s; }
+  .s-backup-card:hover { border-color: var(--border2); }
+  .s-backup-icon { margin: 0 auto 8px; color: var(--text3); display: flex; justify-content: center; }
+  .s-backup-label { font-size: 12.5px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+  .s-backup-desc  { font-size: 11px; color: var(--text3); margin-bottom: 12px; line-height: 1.4; }
+  .s-stat-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--border); }
+  .s-stat-row:last-child { border-bottom: none; }
+  .s-stat-key { font-size: 12px; color: var(--text3); }
+  .s-stat-val { font-size: 12.5px; font-weight: 600; color: var(--text); font-family: 'Geist Mono', monospace; }
+  .s-user-card { display: flex; align-items: center; gap: 12px; padding: 10px 12px; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 8px; }
+  .s-user-info { flex: 1; }
+  .s-user-name { font-size: 13.5px; font-weight: 600; color: var(--text); }
+  .s-user-role { font-size: 11.5px; color: var(--text3); margin-top: 1px; }
+  .s-user-edit { display: flex; gap: 6px; margin-top: 6px; }
+  .s-user-edit input { flex: 1; background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 5px 9px; border-radius: var(--radius); font-family: 'Geist', sans-serif; font-size: 12.5px; outline: none; }
+  .s-user-edit input:focus { border-color: var(--accent); }
+  .s-color-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; border: 1px solid rgba(0,0,0,0.1); }
+  .danger-zone { border-color: var(--red-md) !important; }
+  .danger-zone .s-card-hd { background: var(--red-lt); border-bottom-color: var(--red-md); }
+  .danger-zone .s-card-icon { background: var(--red-lt); color: var(--red); }
+
+  /* BULK ACTION BAR */
+  .bulk-bar {
+    display: none; align-items: center; gap: 10px;
+    padding: 10px 20px; background: var(--accent); color: #fff;
+    border-bottom: 1px solid var(--accent-md); flex-shrink: 0;
+    animation: slideDown 0.15s ease;
+  }
+  .bulk-bar.visible { display: flex; }
+  @keyframes slideDown { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
+  .bulk-count { font-size: 13px; font-weight: 600; margin-right: 4px; }
+  .bulk-label { font-size: 13px; opacity: 0.85; }
+  .bulk-actions { display: flex; gap: 6px; margin-left: auto; }
+  .bulk-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 13px; border-radius: var(--radius); border: none;
+    cursor: pointer; font-family: 'Geist', sans-serif; font-size: 12.5px; font-weight: 500;
+    background: rgba(255,255,255,0.18); color: #fff; transition: background 0.13s;
+  }
+  .bulk-btn:hover { background: rgba(255,255,255,0.28); }
+  .bulk-btn.danger { background: rgba(255,255,255,0.12); }
+  .bulk-btn.danger:hover { background: var(--red); }
+  .bulk-desel { background: none; border: 1.5px solid rgba(255,255,255,0.3); }
+  .bulk-desel:hover { background: rgba(255,255,255,0.15); }
+
+  /* BULK TAG MODAL */
+  .bulk-tag-modal { width: 420px; }
+  .btag-list { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; min-height: 36px; }
+  .btag-chip {
+    display: inline-flex; align-items: center; gap: 5px; padding: 4px 11px;
+    border-radius: 20px; font-size: 12px; font-weight: 500; cursor: pointer;
+    border: 1.5px solid var(--border); background: var(--surface2); color: var(--text2);
+    transition: all 0.12s; user-select: none;
+  }
+  .btag-chip:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-lt); }
+  .btag-chip.selected { border-color: var(--accent); color: var(--accent); background: var(--accent-lt); font-weight: 600; }
+  .btag-chip .check-icon { display: none; }
+  .btag-chip.selected .check-icon { display: inline; }
+
+  /* BULK STATUS / OWNER DROPDOWNS */
+  .bulk-dropdown { position: relative; }
+  .bulk-dropdown-menu {
+    position: absolute; top: calc(100% + 6px); right: 0; z-index: 300;
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius2);
+    box-shadow: var(--shadow2); min-width: 180px; overflow: hidden;
+    display: none;
+  }
+  .bulk-dropdown-menu.open { display: block; }
+  .bulk-dd-item {
+    display: flex; align-items: center; gap: 8px; padding: 8px 14px;
+    font-size: 13px; color: var(--text2); cursor: pointer; transition: background 0.1s;
+    border: none; background: none; width: 100%; text-align: left; font-family: 'Geist', sans-serif;
+  }
+  .bulk-dd-item:hover { background: var(--surface2); color: var(--text); }
+  .bulk-dd-sep { height: 1px; background: var(--border); margin: 4px 0; }
+  .imp-modal { width: 640px; max-width: 95vw; }
+  .imp-drop {
+    border: 2px dashed var(--border2); border-radius: var(--radius2);
+    padding: 40px 20px; text-align: center; cursor: pointer; transition: all 0.15s;
+    background: var(--surface2);
+  }
+  .imp-drop:hover, .imp-drop.drag { border-color: var(--accent); background: var(--accent-lt); }
+  .imp-drop-icon { margin-bottom: 10px; color: var(--text3); }
+  .imp-drop-txt { font-size: 14px; color: var(--text2); font-weight: 500; }
+  .imp-drop-sub { font-size: 12px; color: var(--text3); margin-top: 4px; }
+  .imp-file-info { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: var(--accent-lt); border: 1px solid var(--accent-md); border-radius: var(--radius); font-size: 13px; color: var(--accent); font-weight: 500; }
+  .imp-map-grid { display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; align-items: center; margin-bottom: 6px; }
+  .imp-map-grid .map-from { font-size: 12.5px; color: var(--text); font-weight: 500; padding: 6px 10px; background: var(--surface2); border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .imp-map-grid .map-arr { color: var(--text3); display: flex; justify-content: center; }
+  .imp-map-grid select { background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 6px 10px; border-radius: var(--radius); font-family: 'Geist', sans-serif; font-size: 12.5px; outline: none; -webkit-appearance: none; width: 100%; }
+  .imp-map-grid select:focus { border-color: var(--accent); }
+  .imp-preview { font-size: 11px; color: var(--text3); margin-top: 2px; font-family: 'Geist Mono', monospace; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding-left: 2px; }
+  .imp-map-hdr { display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; margin-bottom: 8px; }
+  .imp-map-hdr span { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text3); padding: 0 2px; }
+  .imp-map-hdr span:last-child { text-align: left; }
+  .imp-results { padding: 14px; background: var(--accent-lt); border: 1px solid var(--accent-md); border-radius: var(--radius); font-size: 13px; color: var(--accent); }
+  .imp-scroll { max-height: 340px; overflow-y: auto; padding-right: 4px; }
+</style>
+</head>
+<body>
+
+<!-- SVG SPRITE -->
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+  <symbol id="ic-contacts" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="6" cy="5" r="2.5"/><path d="M1 13c0-3 2-4.5 5-4.5s5 1.5 5 4.5"/><path d="M11 3a2.5 2.5 0 0 1 0 5"/><path d="M15 13c0-2.5-1.5-4-4-4.5"/>
+  </symbol>
+  <symbol id="ic-chart" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="1" y="9" width="3" height="5" rx=".5"/><rect x="6.5" y="6" width="3" height="8" rx=".5"/><rect x="12" y="3" width="3" height="11" rx=".5"/>
+  </symbol>
+  <symbol id="ic-grid" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+    <rect x="1.5" y="1.5" width="5" height="5" rx="1"/><rect x="9.5" y="1.5" width="5" height="5" rx="1"/>
+    <rect x="1.5" y="9.5" width="5" height="5" rx="1"/><rect x="9.5" y="9.5" width="5" height="5" rx="1"/>
+  </symbol>
+  <symbol id="ic-sparkle" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M8 1v14M1 8h14M4 4l8 8M12 4 4 12"/>
+  </symbol>
+  <symbol id="ic-send" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M14 2 2 7l5 2 2 5z"/><path d="M7 9l4-4"/>
+  </symbol>
+  <symbol id="ic-reply" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M14 5H6a4 4 0 1 0 0 8h1"/><path d="M9 2l5 3-5 3"/>
+  </symbol>
+  <symbol id="ic-star" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M8 1.5l1.8 3.9 4.2.5-3.1 3 .8 4.2L8 11l-3.7 2.1.8-4.2L2 5.9l4.2-.5z"/>
+  </symbol>
+  <symbol id="ic-doc" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="2" y="1.5" width="10" height="13" rx="1.5"/><path d="M5 5h5M5 8h5M5 11h3"/><path d="M10 1.5v3.5h3.5"/>
+  </symbol>
+  <symbol id="ic-check-circle" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="8" cy="8" r="6.5"/><path d="M5 8l2.5 2.5L11 5.5"/>
+  </symbol>
+  <symbol id="ic-x-circle" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="8" cy="8" r="6.5"/><path d="M5.5 5.5l5 5M10.5 5.5l-5 5"/>
+  </symbol>
+  <symbol id="ic-linkedin" viewBox="0 0 16 16">
+    <rect width="16" height="16" rx="2.5" fill="#0A66C2"/>
+    <rect x="2.5" y="6" width="2" height="7.5" fill="white"/><circle cx="3.5" cy="3.75" r="1.25" fill="white"/>
+    <path d="M6.5 6h2v1.1c.4-.7 1.3-1.3 2.5-1.3 2 0 3 1.2 3 3.2v4.5h-2V9.2c0-1-.4-1.7-1.4-1.7s-1.6.7-1.6 1.8v4.2h-2z" fill="white"/>
+  </symbol>
+  <symbol id="ic-mail" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="1.5" y="3.5" width="13" height="9" rx="1.5"/><path d="M1.5 4.5L8 9.5l6.5-5"/>
+  </symbol>
+  <symbol id="ic-phone" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4.2 1.5H7l1.5 4-2.2 1.5a9 9 0 0 0 3 3l1.5-2.2 4 1.5V12A1.5 1.5 0 0 1 13.3 13.5C6 13.5 1.5 8.5 1.5 3A1.5 1.5 0 0 1 3 1.5h1.2z"/>
+  </symbol>
+  <symbol id="ic-edit" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M11.5 2a2 2 0 0 1 2.5 2.5L5.5 13 1.5 14.5 3 10.5z"/>
+  </symbol>
+  <symbol id="ic-trash" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M2 4h12M5 4V2.5h6V4M6 7v5M10 7v5M3.5 4l.5 9.5h8L13 4"/>
+  </symbol>
+  <symbol id="ic-x" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+    <path d="M3 3l10 10M13 3 3 13"/>
+  </symbol>
+  <symbol id="ic-search" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+    <circle cx="6.5" cy="6.5" r="4.5"/><path d="M10 10l4 4"/>
+  </symbol>
+  <symbol id="ic-download" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M8 2v9M4.5 8l3.5 4 3.5-4M2 13.5h12"/>
+  </symbol>
+  <symbol id="ic-plus" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+    <path d="M8 2v12M2 8h12"/>
+  </symbol>
+  <symbol id="ic-note" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M13 9V3.5A1.5 1.5 0 0 0 11.5 2h-7A1.5 1.5 0 0 0 3 3.5v9A1.5 1.5 0 0 0 4.5 14H9"/><path d="M9 14v-5h5"/>
+  </symbol>
+  <symbol id="ic-swap" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M3 5h10M10 2.5L12.5 5 10 7.5M13 11H3M6 8.5L3.5 11 6 13.5"/>
+  </symbol>
+  <symbol id="ic-arrow-up" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M8 13V3M4 7l4-4 4 4"/>
+  </symbol>
+  <symbol id="ic-arrow-right" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M3 8h10M9 4l4 4-4 4"/>
+  </symbol>
+  <symbol id="ic-minus" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+    <path d="M3 8h10"/>
+  </symbol>
+  <symbol id="ic-settings" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="8" cy="8" r="2.5"/>
+    <path d="M8 1.5v1M8 13.5v1M1.5 8h1M13.5 8h1M3.4 3.4l.7.7M11.9 11.9l.7.7M3.4 12.6l.7-.7M11.9 4.1l.7-.7"/>
+  </symbol>
+  <symbol id="ic-users" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="6" cy="5" r="2.5"/><path d="M1 13c0-3 2-4.5 5-4.5s5 1.5 5 4.5"/>
+    <path d="M11 3a2.5 2.5 0 0 1 0 5M15 13c0-2.5-1.5-4-4-4.5"/>
+  </symbol>
+  <symbol id="ic-pipeline" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M1.5 4h13M1.5 8h10M1.5 12h7"/>
+  </symbol>
+  <symbol id="ic-database" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <ellipse cx="8" cy="4" rx="5.5" ry="2"/><path d="M2.5 4v4c0 1.1 2.5 2 5.5 2s5.5-.9 5.5-2V4"/><path d="M2.5 8v4c0 1.1 2.5 2 5.5 2s5.5-.9 5.5-2V8"/>
+  </symbol>
+  <symbol id="ic-restore" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M2.5 8A5.5 5.5 0 1 0 4 4.5L2.5 3v4h4"/>
+  </symbol>
+  <symbol id="ic-warning" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M8 1.5L1 14.5h14z"/><path d="M8 6v4M8 11.5v.5"/>
+  </symbol>
+  <symbol id="ic-check" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M2.5 8l4 4 7-8"/>
+  </symbol>
+  <symbol id="ic-drag" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+    <path d="M5 4h1M5 8h1M5 12h1M10 4h1M10 8h1M10 12h1"/>
+  </symbol>
+    <path d="M2 2h5.5l6 6a2 2 0 0 1 0 2.8l-2.7 2.7a2 2 0 0 1-2.8 0L2 7.5V2z"/><circle cx="5.5" cy="5.5" r="1"/>
+  </symbol>
+  <symbol id="ic-upload" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M8 10V2M4.5 5.5L8 2l3.5 3.5M2 13.5h12"/>
+  </symbol>
+  <symbol id="ic-import" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M2.5 8h9M8 5l3.5 3L8 11M13 3v10"/>
+  </symbol>
+  <symbol id="ic-file-csv" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M9 1.5H4A1.5 1.5 0 0 0 2.5 3v10A1.5 1.5 0 0 0 4 14.5h8A1.5 1.5 0 0 0 13.5 13V6L9 1.5z"/><path d="M9 1.5V6H13.5"/>
+    <path d="M5 10c0 .8.6 1.5 1.5 1.5s1.5-.7 1.5-1.5-.7-1.5-1.5-1.5-1 .5-1 1"/><path d="M10.5 8.5h-1v3h1m-1-1.5h.8"/>
+  </symbol>
+</svg>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="logo">BBC <em>Akquise</em></div>
+  <nav class="nav">
+    <button class="nav-btn active" onclick="showView('contacts')">
+      <svg width="14" height="14"><use href="#ic-contacts"/></svg> Kontakte
+    </button>
+    <button class="nav-btn" onclick="showView('analytics')">
+      <svg width="14" height="14"><use href="#ic-chart"/></svg> Analysen
+    </button>
+    <button class="nav-btn" onclick="showView('settings')">
+      <svg width="14" height="14"><use href="#ic-settings"/></svg> Einstellungen
+    </button>
+  </nav>
+  <div class="header-right">
+    <div class="user-toggle" onclick="toggleUser()" title="Nutzer wechseln">
+      <div class="avatar av-c" id="avBig">C</div>
+      <span id="uName">Christian</span>
+    </div>
+  </div>
+</div>
+
+<div class="layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-section">Pipeline</div>
+    <div class="sb-item active" id="sbItemAlle" onclick="setFilter('status','alle',this)">
+      <svg width="14" height="14"><use href="#ic-grid"/></svg>
+      Alle <span class="sb-cnt" id="cnt-alle">0</span>
+    </div>
+    <div class="sb-item" onclick="setFilter('status','neu',this)">
+      <svg width="14" height="14"><use href="#ic-sparkle"/></svg>
+      Neu <span class="sb-cnt" id="cnt-neu">0</span>
+    </div>
+    <div class="sb-item" onclick="setFilter('status','kontaktiert',this)">
+      <svg width="14" height="14"><use href="#ic-send"/></svg>
+      Kontaktiert <span class="sb-cnt" id="cnt-kontaktiert">0</span>
+    </div>
+    <div class="sb-item" onclick="setFilter('status','antwort',this)">
+      <svg width="14" height="14"><use href="#ic-reply"/></svg>
+      Antwort erhalten <span class="sb-cnt" id="cnt-antwort">0</span>
+    </div>
+    <div class="sb-item" onclick="setFilter('status','qualifiziert',this)">
+      <svg width="14" height="14"><use href="#ic-star"/></svg>
+      Qualifiziert <span class="sb-cnt" id="cnt-qualifiziert">0</span>
+    </div>
+    <div class="sb-item" onclick="setFilter('status','angebot',this)">
+      <svg width="14" height="14"><use href="#ic-doc"/></svg>
+      Angebot gesendet <span class="sb-cnt" id="cnt-angebot">0</span>
+    </div>
+    <div class="sb-item" onclick="setFilter('status','gewonnen',this)">
+      <svg width="14" height="14"><use href="#ic-check-circle"/></svg>
+      Gewonnen <span class="sb-cnt" id="cnt-gewonnen">0</span>
+    </div>
+    <div class="sb-item" onclick="setFilter('status','verloren',this)">
+      <svg width="14" height="14"><use href="#ic-x-circle"/></svg>
+      Verloren <span class="sb-cnt" id="cnt-verloren">0</span>
+    </div>
+    <div class="sb-section" style="margin-top:6px">Kanäle</div>
+    <div class="sb-item" onclick="setFilter('kanal','LinkedIn',this)">
+      <svg width="14" height="14"><use href="#ic-linkedin"/></svg>
+      LinkedIn <span class="sb-cnt" id="cnt-linkedin">0</span>
+    </div>
+    <div class="sb-item" onclick="setFilter('kanal','Email',this)">
+      <svg width="14" height="14"><use href="#ic-mail"/></svg>
+      E-Mail <span class="sb-cnt" id="cnt-email">0</span>
+    </div>
+    <div class="sb-item" onclick="setFilter('kanal','Telefon',this)">
+      <svg width="14" height="14"><use href="#ic-phone"/></svg>
+      Telefon <span class="sb-cnt" id="cnt-telefon">0</span>
+    </div>
+    <div class="sb-section" style="margin-top:6px">Tags</div>
+    <div id="sbTags"></div>
+    <div class="sb-section" style="margin-top:6px">Team</div>
+    <div id="sbTeam"></div>
+  </aside>
+
+  <!-- CONTACTS VIEW -->
+  <div class="main" id="viewContacts">
+    <div class="stats-bar" id="statsBar"></div>
+
+    <!-- BULK ACTION BAR -->
+    <div class="bulk-bar" id="bulkBar">
+      <span class="bulk-count" id="bulkCount">0</span>
+      <span class="bulk-label">Kontakte ausgewählt</span>
+      <div class="bulk-actions">
+        <div class="bulk-dropdown" id="bdStatus">
+          <button class="bulk-btn" onclick="toggleBulkDd('bdStatus')">
+            <svg width="12" height="12"><use href="#ic-pipeline"/></svg> Status ändern
+          </button>
+          <div class="bulk-dropdown-menu" id="bdStatus-menu"></div>
+        </div>
+        <div class="bulk-dropdown" id="bdOwner">
+          <button class="bulk-btn" onclick="toggleBulkDd('bdOwner')">
+            <svg width="12" height="12"><use href="#ic-users"/></svg> Zuständig
+          </button>
+          <div class="bulk-dropdown-menu" id="bdOwner-menu"></div>
+        </div>
+        <button class="bulk-btn" onclick="openBulkTags()">
+          <svg width="12" height="12"><use href="#ic-tag"/></svg> Tags hinzufügen
+        </button>
+        <button class="bulk-btn" onclick="exportCSV()">
+          <svg width="12" height="12"><use href="#ic-download"/></svg> Exportieren
+        </button>
+        <button class="bulk-btn danger" onclick="bulkDelete()">
+          <svg width="12" height="12"><use href="#ic-trash"/></svg> Löschen
+        </button>
+        <button class="bulk-btn bulk-desel" onclick="clearSelection()">
+          <svg width="12" height="12"><use href="#ic-x"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="toolbar">
+      <div class="search-wrap">
+        <div class="s-ico"><svg width="14" height="14"><use href="#ic-search"/></svg></div>
+        <input type="text" placeholder="Name, Firma, Branche …" id="searchInput" oninput="renderTable()">
+      </div>
+      <button class="btn btn-primary" onclick="openAdd()">
+        <svg width="13" height="13"><use href="#ic-plus"/></svg> Kontakt
+      </button>
+      <button class="btn btn-ghost" onclick="openImport()">
+        <svg width="13" height="13"><use href="#ic-import"/></svg> Import
+      </button>
+      <button class="btn btn-ghost" onclick="exportCSV()">
+        <svg width="13" height="13"><use href="#ic-download"/></svg> Export
+      </button>
+      <div class="filter-pills" id="pills"></div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th class="chk" style="width:36px"><input type="checkbox" id="chkAll" onchange="toggleAll()"></th>
+            <th onclick="sortBy('name')">Name <span id="si-name"></span></th>
+            <th onclick="sortBy('branche')">Branche <span id="si-branche"></span></th>
+            <th onclick="sortBy('kanal')">Kanal <span id="si-kanal"></span></th>
+            <th onclick="sortBy('status')">Status <span id="si-status"></span></th>
+            <th onclick="sortBy('prioritaet')">Priorität <span id="si-prioritaet"></span></th>
+            <th onclick="sortBy('owner')">Zuständig <span id="si-owner"></span></th>
+            <th onclick="sortBy('lastContact')">Letzter Kontakt <span id="si-lastContact"></span></th>
+            <th>Tags</th>
+            <th style="width:72px"></th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+      <div id="emptyState" class="empty" style="display:none">
+        <div class="empty-ico"><svg width="36" height="36"><use href="#ic-contacts"/></svg></div>
+        <div class="empty-txt">Keine Kontakte gefunden</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ANALYTICS VIEW -->
+  <div class="main" id="viewAnalytics" style="display:none">
+    <div class="analytics-wrap" id="analyticsWrap"></div>
+  </div>
+
+  <!-- SETTINGS VIEW -->
+  <div class="main" id="viewSettings" style="display:none; background:var(--bg)">
+    <div class="settings-wrap" id="settingsWrap"></div>
+  </div>
+
+  <!-- DETAIL PANEL -->
+  <div class="detail-panel" id="detailPanel">
+    <div id="detailContent"></div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="overlay" id="overlay" onclick="closeModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-hd">
+      <div class="modal-title" id="modalTitle">Kontakt hinzufügen</div>
+      <button class="ico-btn" onclick="closeModal()"><svg width="13" height="13"><use href="#ic-x"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="field"><label>Vorname *</label><input id="f-vorname" placeholder="Max"></div>
+      <div class="field"><label>Nachname *</label><input id="f-nachname" placeholder="Mustermann"></div>
+      <div class="field"><label>Firma</label><input id="f-firma" placeholder="Muster GmbH"></div>
+      <div class="field"><label>Position</label><input id="f-position" placeholder="Geschäftsführer"></div>
+      <div class="field"><label>Branche</label><input id="f-branche" placeholder="SaaS, Handel …"></div>
+      <div class="field"><label>E-Mail</label><input type="email" id="f-email" placeholder="max@firma.de"></div>
+      <div class="field"><label>Telefon</label><input type="tel" id="f-tel" placeholder="+49 …"></div>
+      <div class="field"><label>LinkedIn-URL</label><input id="f-linkedin" placeholder="linkedin.com/in/…"></div>
+      <div class="field ff">
+        <label>Kanäle * <span style="font-weight:400;color:var(--text3);text-transform:none;letter-spacing:0;font-size:11px">(Mehrfachauswahl möglich)</span></label>
+        <div class="kanal-checks">
+          <label class="kcheck kcheck-li">
+            <input type="checkbox" id="kch-li" value="LinkedIn">
+            <span class="kcheck-box"><svg width="12" height="12"><use href="#ic-linkedin"/></svg> LinkedIn</span>
+          </label>
+          <label class="kcheck kcheck-em">
+            <input type="checkbox" id="kch-em" value="Email">
+            <span class="kcheck-box"><svg width="12" height="12"><use href="#ic-mail"/></svg> E-Mail</span>
+          </label>
+          <label class="kcheck kcheck-tel">
+            <input type="checkbox" id="kch-tel" value="Telefon">
+            <span class="kcheck-box"><svg width="12" height="12"><use href="#ic-phone"/></svg> Telefon</span>
+          </label>
+        </div>
+      </div>
+      <div class="field"><label>Status *</label><div class="sel-w"><select id="f-status">
+        <option value="neu">Neu</option><option value="kontaktiert">Kontaktiert</option>
+        <option value="antwort">Antwort erhalten</option><option value="qualifiziert">Qualifiziert</option>
+        <option value="angebot">Angebot gesendet</option><option value="gewonnen">Gewonnen</option><option value="verloren">Verloren</option>
+      </select></div></div>
+      <div class="field"><label>Priorität</label><div class="sel-w"><select id="f-prio">
+        <option value="hoch">Hoch</option><option value="mittel" selected>Mittel</option><option value="niedrig">Niedrig</option>
+      </select></div></div>
+      <div class="field"><label>Zuständig</label><div class="sel-w"><select id="f-owner"></select></div></div>
+      <div class="field"><label>Letzter Kontakt</label><input type="date" id="f-date"></div>
+      <div class="field ff">
+        <label>Nächste Aktion</label>
+        <div class="next-action-wrap">
+          <div class="na-presets">
+            <button type="button" class="na-btn" onclick="setNextAction(7,this)">1 Woche</button>
+            <button type="button" class="na-btn" onclick="setNextAction(14,this)">2 Wochen</button>
+            <button type="button" class="na-btn" onclick="setNextAction(30,this)">1 Monat</button>
+            <button type="button" class="na-btn" onclick="setNextAction(90,this)">3 Monate</button>
+            <button type="button" class="na-btn" onclick="setNextAction(180,this)">6 Monate</button>
+          </div>
+          <input type="date" id="f-next" class="na-date-input" oninput="clearNaActive()">
+        </div>
+      </div>
+      <div class="field ff"><label>Tags</label>
+        <div class="tag-input-row">
+          <input id="f-tag-input" placeholder="Tag eingeben + Enter" onkeydown="addTagFromInput(event)">
+          <button type="button" class="btn btn-ghost" style="padding:7px 12px" onclick="addTagFromInput({key:'Enter'})">
+            <svg width="13" height="13"><use href="#ic-plus"/></svg>
+          </button>
+        </div>
+        <div class="tag-suggest" id="f-tag-suggest"></div>
+        <div class="tags-wrap" id="f-tags-wrap"></div>
+      </div>
+      <div class="field ff"><label>Notiz</label><textarea id="f-notiz" placeholder="Kurze Notiz zum Kontakt …"></textarea></div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-ghost" onclick="closeModal()">Abbrechen</button>
+      <button class="btn btn-primary" id="saveBtn" onclick="saveContact()">Speichern</button>
+    </div>
+  </div>
+</div>
+
+<!-- BULK TAG MODAL -->
+<div class="overlay" id="bulkTagOverlay" onclick="closeBulkTags(event)">
+  <div class="modal bulk-tag-modal" onclick="event.stopPropagation()">
+    <div class="modal-hd">
+      <div>
+        <div class="modal-title">Tags hinzufügen</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:2px" id="bulkTagSub"></div>
+      </div>
+      <button class="ico-btn" onclick="closeBulkTags()"><svg width="13" height="13"><use href="#ic-x"/></svg></button>
+    </div>
+    <div style="padding:18px 22px">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--text3);margin-bottom:10px">Tags auswählen oder neu anlegen</div>
+      <div class="btag-list" id="bulkTagList"></div>
+      <div class="s-add-row">
+        <input id="bulkTagNew" placeholder="Neuer Tag …" onkeydown="if(event.key==='Enter')bulkTagAddNew()">
+        <button class="btn btn-ghost" style="padding:7px 12px" onclick="bulkTagAddNew()">
+          <svg width="13" height="13"><use href="#ic-plus"/></svg>
+        </button>
+      </div>
+      <div style="margin-top:10px;font-size:11.5px;color:var(--text3)" id="bulkTagMode">
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
+          <input type="checkbox" id="bulkTagReplace" style="accent-color:var(--accent)">
+          Vorhandene Tags ersetzen (statt hinzufügen)
+        </label>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-ghost" onclick="closeBulkTags()">Abbrechen</button>
+      <button class="btn btn-primary" onclick="applyBulkTags()">
+        <svg width="13" height="13"><use href="#ic-check"/></svg> Anwenden
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM DIALOG -->
+<div class="overlay" id="confirmOverlay">
+  <div class="modal" style="width:380px;max-width:95vw" onclick="event.stopPropagation()">
+    <div class="modal-hd">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:32px;height:32px;border-radius:var(--radius);background:var(--red-lt);display:flex;align-items:center;justify-content:center;color:var(--red)">
+          <svg width="15" height="15"><use href="#ic-warning"/></svg>
+        </div>
+        <div class="modal-title" id="confirmTitle">Bestätigen</div>
+      </div>
+    </div>
+    <div style="padding:16px 22px 4px;font-size:13.5px;color:var(--text2);line-height:1.5" id="confirmMsg"></div>
+    <div class="modal-ft">
+      <button class="btn btn-ghost" onclick="confirmResolve(false)">Abbrechen</button>
+      <button class="btn btn-danger" id="confirmOkBtn" onclick="confirmResolve(true)">Löschen</button>
+    </div>
+  </div>
+</div>
+
+<!-- IMPORT MODAL -->
+<div class="overlay" id="importOverlay" onclick="closeImport(event)">
+  <div class="modal imp-modal" onclick="event.stopPropagation()">
+    <div class="modal-hd">
+      <div class="modal-title" id="importTitle">CSV importieren</div>
+      <button class="ico-btn" onclick="closeImport()"><svg width="13" height="13"><use href="#ic-x"/></svg></button>
+    </div>
+    <div style="padding:20px 22px" id="importBody">
+      <!-- Step 1: Upload -->
+      <div id="impStep1">
+        <div class="imp-drop" id="impDrop" onclick="document.getElementById('impFileInput').click()"
+          ondragover="event.preventDefault();this.classList.add('drag')"
+          ondragleave="this.classList.remove('drag')"
+          ondrop="handleDrop(event)">
+          <div class="imp-drop-icon"><svg width="32" height="32"><use href="#ic-file-csv"/></svg></div>
+          <div class="imp-drop-txt">CSV-Datei auswählen oder hier ablegen</div>
+          <div class="imp-drop-sub">Trennzeichen: Semikolon (;) oder Komma (,) · UTF-8</div>
+        </div>
+        <input type="file" id="impFileInput" accept=".csv,text/csv" style="display:none" onchange="handleFileSelect(this.files[0])">
+        <div id="impFileInfo" style="display:none;margin-top:12px"></div>
+      </div>
+      <!-- Step 2: Mapping -->
+      <div id="impStep2" style="display:none">
+        <div id="impFileInfo2" style="margin-bottom:14px"></div>
+        <div class="imp-map-hdr">
+          <span>Spalte in CSV-Datei</span><span></span><span>Feld im Tracker</span>
+        </div>
+        <div class="imp-scroll">
+          <div id="impMapRows"></div>
+        </div>
+        <div id="impResultMsg" style="display:none;margin-top:14px"></div>
+      </div>
+    </div>
+    <div class="modal-ft" id="importFt">
+      <button class="btn btn-ghost" onclick="closeImport()">Abbrechen</button>
+      <button class="btn btn-primary" id="impNextBtn" onclick="impNext()">
+        <svg width="13" height="13"><use href="#ic-import"/></svg> Weiter
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="notif" id="notif"></div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────
+let contacts = JSON.parse(localStorage.getItem('akq_v6') || 'null') || seed();
+let activeUser = localStorage.getItem('akq_user') || 'Christian';
+let flt = { type:'status', val:'alle' };
+let impState = { step:1, headers:[], rows:[], sep:';' };
+let srt = { col:'lastContact', dir:-1 };
+let editId = null, detailId = null, selIds = new Set();
+
+function seed() {
+  return [
+    { id:'1', vorname:'Thomas',  nachname:'Becker',  firma:'Becker & Partner GmbH', position:'Geschäftsführer',   branche:'Maschinenbau',         email:'t.becker@becker.de',     tel:'+49 211 123456', linkedin:'', kanaele:['LinkedIn','Email'],         status:'qualifiziert',  prioritaet:'hoch',    owner:'Christian', lastContact:'2026-03-14', nextAction:'2026-03-20', tags:['Messe','Warmkontakt'],   notizen:[], createdAt:'2026-02-01' },
+    { id:'2', vorname:'Sandra',  nachname:'Koch',    firma:'Koch Digital AG',        position:'Marketing Leiterin', branche:'E-Commerce',           email:'s.koch@kochdigital.de',  tel:'+49 30 654321',  linkedin:'', kanaele:['Email'],                   status:'antwort',       prioritaet:'mittel',  owner:'Christian', lastContact:'2026-03-16', nextAction:'2026-03-21', tags:['SEO','Google Ads'],      notizen:[], createdAt:'2026-02-10' },
+    { id:'3', vorname:'Markus',  nachname:'Ziegler', firma:'Ziegler Logistik',       position:'CEO',                branche:'Logistik',             email:'m.ziegler@zl.de',        tel:'+49 221 987654', linkedin:'', kanaele:['Telefon'],                 status:'kontaktiert',   prioritaet:'niedrig', owner:'Partner',   lastContact:'2026-03-10', nextAction:'2026-03-25', tags:['Kaltakquise'],           notizen:[], createdAt:'2026-02-15' },
+    { id:'4', vorname:'Julia',   nachname:'Hoffmann',firma:'Hoffmann Solutions',     position:'Inhaberin',          branche:'IT-Dienstleistung',    email:'j.hoffmann@hs.de',       tel:'+49 89 112233',  linkedin:'', kanaele:['LinkedIn','Telefon'],       status:'angebot',       prioritaet:'hoch',    owner:'Partner',   lastContact:'2026-03-17', nextAction:'2026-03-22', tags:['Warmkontakt','CRM'],     notizen:[], createdAt:'2026-02-20' },
+    { id:'5', vorname:'Peter',   nachname:'Lang',    firma:'Lang & Co. KG',          position:'Vertriebsleiter',    branche:'Handel',               email:'p.lang@langco.de',       tel:'',               linkedin:'', kanaele:['LinkedIn'],                status:'neu',           prioritaet:'mittel',  owner:'Christian', lastContact:'2026-03-18', nextAction:'',           tags:['Messe'],                 notizen:[], createdAt:'2026-03-01' },
+    { id:'6', vorname:'Anna',    nachname:'Müller',  firma:'Müller Consulting',      position:'Beraterin',          branche:'Unternehmensberatung', email:'a.mueller@mc.de',        tel:'+49 69 445566',  linkedin:'', kanaele:['Email','Telefon'],          status:'gewonnen',      prioritaet:'hoch',    owner:'Christian', lastContact:'2026-03-05', nextAction:'',           tags:['Google Ads','Empfehlung'],notizen:[], createdAt:'2026-01-15' },
+    { id:'7', vorname:'René',    nachname:'Schulz',  firma:'Schulz Tech',            position:'CTO',                branche:'Software',             email:'r.schulz@schulztech.de', tel:'+49 40 778899',  linkedin:'', kanaele:['LinkedIn'],                status:'verloren',      prioritaet:'niedrig', owner:'Partner',   lastContact:'2026-02-28', nextAction:'',           tags:['Kaltakquise'],           notizen:[], createdAt:'2026-01-20' },
+    { id:'8', vorname:'Katrin',  nachname:'Richter', firma:'Richter Immobilien',     position:'GF',                 branche:'Immobilien',           email:'k.richter@ri.de',        tel:'+49 711 334455', linkedin:'', kanaele:['LinkedIn','Email','Telefon'],status:'kontaktiert',   prioritaet:'mittel',  owner:'Partner',   lastContact:'2026-03-12', nextAction:'2026-03-26', tags:['SEO','Empfehlung'],      notizen:[], createdAt:'2026-03-05' },
+  ];
+}
+
+// ── HELPERS ───────────────────────────────────────────────────
+const AVC = [['#e8f2ec','#1a5c3a'],['#edf2f8','#1a3a5c'],['#fdf6e3','#8a5a00'],['#eaf4f2','#1a6a5a'],['#f4eef8','#5a1a7a'],['#fdf0ee','#c0392b']];
+function fullName(c) { return ((c.vorname||c.name||'')+' '+(c.nachname||'')).trim(); }
+function avc(c) { const n=fullName(c); let h=0; for(let ch of n) h+=ch.charCodeAt(0); return AVC[h%AVC.length]; }
+function ini(c) { const v=(c.vorname||c.name||'')[0]||''; const n=(c.nachname||'')[0]||''; return (v+n).toUpperCase()||'?'; }
+function fmt(d) { if(!d) return '—'; return new Date(d).toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'}); }
+function today() { return new Date().toISOString().slice(0,10); }
+function persist() { localStorage.setItem('akq_v6', JSON.stringify(contacts)); }
+
+// ── NEXT ACTION HELPERS ───────────────────────────────────────
+function setNextAction(days, btn) {
+  const d = new Date(); d.setDate(d.getDate() + days);
+  document.getElementById('f-next').value = d.toISOString().slice(0,10);
+  document.querySelectorAll('.na-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+function clearNaActive() {
+  document.querySelectorAll('.na-btn').forEach(b=>b.classList.remove('active'));
+}
+
+// ── CHANNEL HELPERS ───────────────────────────────────────────
+function getKanaele(c) {
+  // backwards compat: old data may have kanal string
+  if (Array.isArray(c.kanaele)) return c.kanaele;
+  if (c.kanal) return [c.kanal];
+  return [];
+}
+function kanaeleBadges(kanaele) {
+  return `<div class="ch-badges">${kanaele.map(k=>`<span class="ch-badge ${CH_CLS[k]||'ch-li'}"><svg width="11" height="11"><use href="#${CH_ICO[k]||'ic-mail'}"/></svg>${k}</span>`).join('')}</div>`;
+}
+function readKanaeleForm() {
+  return ['li','em','tel'].filter(k=>document.getElementById('kch-'+k)?.checked).map(k=>({'li':'LinkedIn','em':'Email','tel':'Telefon'})[k]);
+}
+function setKanaeleForm(kanaele) {
+  document.getElementById('kch-li').checked  = kanaele.includes('LinkedIn');
+  document.getElementById('kch-em').checked  = kanaele.includes('Email');
+  document.getElementById('kch-tel').checked = kanaele.includes('Telefon');
+}
+function clearKanaeleForm() {
+  ['kch-li','kch-em','kch-tel'].forEach(id=>{ document.getElementById(id).checked=false; });
+}
+const CH_CLS = { LinkedIn:'ch-li', Email:'ch-em', Telefon:'ch-tel' };
+const CH_ICO = { LinkedIn:'ic-linkedin', Email:'ic-mail', Telefon:'ic-phone' };
+const ST_CLS = { neu:'st-neu', kontaktiert:'st-kontaktiert', antwort:'st-antwort', qualifiziert:'st-qualifiziert', angebot:'st-angebot', gewonnen:'st-gewonnen', verloren:'st-verloren' };
+const ST_LBL = { neu:'Neu', kontaktiert:'Kontaktiert', antwort:'Antwort', qualifiziert:'Qualifiziert', angebot:'Angebot', gewonnen:'Gewonnen', verloren:'Verloren' };
+const PR_CLS = { hoch:'pr-hoch', mittel:'pr-mittel', niedrig:'pr-niedrig' };
+const PR_ICO = { hoch:'ic-arrow-up', mittel:'ic-arrow-right', niedrig:'ic-minus' };
+const PR_LBL = { hoch:'Hoch', mittel:'Mittel', niedrig:'Niedrig' };
+
+// ── USER ──────────────────────────────────────────────────────
+function initUser() {
+  const av = document.getElementById('avBig');
+  av.textContent = activeUser[0];
+  av.className = 'avatar ' + (activeUser==='Christian'?'av-c':'av-p');
+  document.getElementById('uName').textContent = activeUser;
+}
+function toggleUser() {
+  const users = settings?.users || [{name:'Christian'},{name:'Partner'}];
+  const idx = users.findIndex(u=>u.name===activeUser);
+  const next = users[(idx+1) % users.length];
+  activeUser = next.name;
+  localStorage.setItem('akq_user', activeUser);
+  initUser(); notify('Nutzer: '+activeUser,'ok');
+}
+
+// ── VIEW ──────────────────────────────────────────────────────
+function showView(v) {
+  document.getElementById('viewContacts').style.display  = v==='contacts' ?'flex':'none';
+  document.getElementById('viewAnalytics').style.display = v==='analytics'?'flex':'none';
+  document.getElementById('viewSettings').style.display  = v==='settings' ?'flex':'none';
+  document.querySelectorAll('.nav-btn').forEach((b,i)=>b.classList.toggle('active',
+    (i===0&&v==='contacts')||(i===1&&v==='analytics')||(i===2&&v==='settings')));
+  if(v==='analytics') renderAnalytics();
+  if(v==='contacts') { renderTable(); renderStats(); }
+  if(v==='settings') renderSettings();
+}
+
+// ── FILTER ────────────────────────────────────────────────────
+function setFilter(type, val, el) {
+  flt={type,val};
+  document.querySelectorAll('.sb-item').forEach(e=>e.classList.remove('active'));
+  if(el) el.classList.add('active');
+  renderTable(); renderStats(); renderPills();
+}
+function filterByTag(el) {
+  const tag = el.getAttribute('data-tag');
+  if(!tag) return;
+  // toggle: clicking the same tag again resets
+  if(flt.type==='tag' && flt.val===tag) { resetFilter(); return; }
+  flt={type:'tag', val:tag};
+  renderTable(); renderStats(); renderPills();
+}
+function filterByOwner(el) {
+  const owner = el.getAttribute('data-owner');
+  if(!owner) return;
+  if(flt.type==='owner' && flt.val===owner) { resetFilter(); return; }
+  flt={type:'owner', val:owner};
+  renderTable(); renderStats(); renderPills();
+}
+function renderPills() {
+  const p = document.getElementById('pills');
+  if(flt.val==='alle'||!flt.val) { p.innerHTML=''; return; }
+  const lbl={status:'Status',kanal:'Kanal',owner:'Person',tag:'Tag'};
+  p.innerHTML=`<button class="pill active" onclick="resetFilter()">${lbl[flt.type]||flt.type}: ${flt.val} <svg width="9" height="9"><use href="#ic-x"/></svg></button>`;
+}
+function resetFilter() {
+  flt={type:'status',val:'alle'};
+  renderTable(); renderStats(); renderPills();
+  document.querySelectorAll('.sb-item').forEach(e=>e.classList.remove('active'));
+  const allItem = document.getElementById('sbItemAlle');
+  if(allItem) allItem.classList.add('active');
+}
+
+// ── SORT ──────────────────────────────────────────────────────
+function sortBy(col) {
+  if(srt.col===col) srt.dir*=-1; else { srt.col=col; srt.dir=1; }
+  document.querySelectorAll('[id^="si-"]').forEach(e=>e.innerHTML='');
+  const el=document.getElementById('si-'+col);
+  if(el) el.innerHTML=`<svg width="10" height="10" style="${srt.dir===-1?'transform:rotate(180deg)':''}"><use href="#ic-arrow-up"/></svg>`;
+  renderTable();
+}
+
+function getFiltered() {
+  const q=(document.getElementById('searchInput')?.value||'').toLowerCase();
+  return contacts.filter(c=>{
+    const qs=!q||fullName(c).toLowerCase().includes(q)||(c.vorname||'').toLowerCase().includes(q)||(c.nachname||'').toLowerCase().includes(q)||(c.firma||'').toLowerCase().includes(q)||(c.branche||'').toLowerCase().includes(q);
+    const kanaele = getKanaele(c);
+    const fs = flt.type==='status' ? (flt.val==='alle'||c.status===flt.val)
+             : flt.type==='kanal'  ? kanaele.includes(flt.val)
+             : flt.type==='owner'  ? c.owner===flt.val
+             : flt.type==='tag'    ? (c.tags||[]).includes(flt.val)
+             : true;
+    return qs&&fs;
+  }).sort((a,b)=>{
+    let av=a[srt.col]||'', bv=b[srt.col]||'';
+    if(typeof av==='string') av=av.toLowerCase(); if(typeof bv==='string') bv=bv.toLowerCase();
+    return av<bv?-srt.dir:av>bv?srt.dir:0;
+  });
+}
+
+// ── STATS ─────────────────────────────────────────────────────
+function renderStats() {
+  const all=contacts;
+  const won=all.filter(c=>c.status==='gewonnen').length;
+  const pipe=all.filter(c=>!['gewonnen','verloren'].includes(c.status)).length;
+  const cr=all.length?Math.round(won/all.length*100):0;
+  const wk=all.filter(c=>c.lastContact&&(new Date()-new Date(c.lastContact))/86400000<=7).length;
+  const ss=['neu','kontaktiert','antwort','qualifiziert','angebot','gewonnen','verloren'];
+  const elAlle = document.getElementById('cnt-alle');
+  if(elAlle) elAlle.textContent=all.length;
+  ss.forEach(s=>{const el=document.getElementById('cnt-'+s);if(el)el.textContent=all.filter(c=>c.status===s).length;});
+  const elLi=document.getElementById('cnt-linkedin'); if(elLi) elLi.textContent=all.filter(c=>getKanaele(c).includes('LinkedIn')).length;
+  const elEm=document.getElementById('cnt-email');    if(elEm) elEm.textContent=all.filter(c=>getKanaele(c).includes('Email')).length;
+  const elTel=document.getElementById('cnt-telefon'); if(elTel) elTel.textContent=all.filter(c=>getKanaele(c).includes('Telefon')).length;
+
+  // Dynamic team sidebar from settings
+  const users = settings?.users || [{name:'Christian',color:'#1a5c3a'},{name:'Partner',color:'#1a3a5c'}];
+  const sbTeam = document.getElementById('sbTeam');
+  if(sbTeam) {
+    sbTeam.innerHTML = users.map(u=>{
+      const cnt=all.filter(c=>c.owner===u.name).length;
+      const active=flt.type==='owner'&&flt.val===u.name?'active':'';
+      return `<div class="sb-item ${active}" data-owner="${u.name}" onclick="filterByOwner(this)">
+        <div style="width:14px;height:14px;border-radius:50%;background:${u.color}22;color:${u.color};display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;flex-shrink:0">${u.name[0]}</div>
+        <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${u.name}</span>
+        <span class="sb-cnt">${cnt}</span>
+      </div>`;
+    }).join('');
+  }
+
+  // Populate owner select in modal
+  const ownerSel = document.getElementById('f-owner');
+  if(ownerSel) {
+    const cur = ownerSel.value;
+    ownerSel.innerHTML = users.map(u=>`<option value="${u.name}">${u.name}</option>`).join('');
+    if(cur && users.find(u=>u.name===cur)) ownerSel.value=cur;
+  }
+
+  // Tags sidebar
+  const allTags = [...new Set(all.flatMap(c=>c.tags||[]))].sort();
+  const sbTags = document.getElementById('sbTags');
+  if(sbTags) {
+    if(!allTags.length) { sbTags.innerHTML='<div style="padding:4px 10px;font-size:12px;color:var(--text3)">Keine Tags</div>'; }
+    else sbTags.innerHTML = allTags.map(t=>{
+      const cnt=all.filter(c=>(c.tags||[]).includes(t)).length;
+      const active=flt.type==='tag'&&flt.val===t?'active':'';
+      return `<div class="sb-item ${active}" data-tag="${t.replace(/"/g,'&quot;')}" onclick="filterByTag(this)">
+        <svg width="13" height="13"><use href="#ic-tag"/></svg>
+        <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${t}</span>
+        <span class="sb-cnt">${cnt}</span>
+      </div>`;
+    }).join('');
+  }
+
+  document.getElementById('statsBar').innerHTML=`
+    <div class="stat-card"><div class="stat-lbl">Gesamt</div><div class="stat-val">${all.length}</div><div class="stat-sub">Kontakte</div></div>
+    <div class="stat-card"><div class="stat-lbl">In Pipeline</div><div class="stat-val" style="color:var(--accent)">${pipe}</div><div class="stat-sub">Aktiv</div></div>
+    <div class="stat-card"><div class="stat-lbl">Gewonnen</div><div class="stat-val" style="color:var(--teal)">${won}</div><div class="stat-sub up">Abgeschlossen</div></div>
+    <div class="stat-card"><div class="stat-lbl">Conversion</div><div class="stat-val">${cr}<span style="font-size:15px;font-family:'Geist',sans-serif;color:var(--text2)">%</span></div><div class="stat-sub">Gewinnrate</div></div>
+    <div class="stat-card"><div class="stat-lbl">Diese Woche</div><div class="stat-val">${wk}</div><div class="stat-sub">Kontaktierungen</div></div>
+  `;
+}
+
+// ── TABLE ─────────────────────────────────────────────────────
+function renderTable() {
+  const rows=getFiltered();
+  const tbody=document.getElementById('tbody');
+  const empty=document.getElementById('emptyState');
+  if(!rows.length){tbody.innerHTML='';empty.style.display='flex';return;}
+  empty.style.display='none';
+  tbody.innerHTML=rows.map(c=>{
+    const [bg,fg]=avc(c);
+    const sel=selIds.has(c.id)?'sel':'';
+    const fn=fullName(c);
+    return `<tr class="${sel}" onclick="openDetail('${c.id}')">
+      <td class="chk" onclick="event.stopPropagation()"><input type="checkbox" ${selIds.has(c.id)?'checked':''} onchange="toggleSel('${c.id}')"></td>
+      <td><div class="cc-wrap">
+        <div class="c-av" style="background:${bg};color:${fg};border-color:${bg}">${ini(c)}</div>
+        <div>
+          <div class="c-name">${c.nachname||''}<span style="font-weight:400;color:var(--text2)"> ${c.vorname||c.name||''}</span></div>
+          <div class="c-sub">${c.firma||'—'}${c.position?' · '+c.position:''}</div>
+        </div>
+      </div></td>
+      <td style="color:var(--text2);font-size:12.5px">${c.branche||'—'}</td>
+      <td>${kanaeleBadges(getKanaele(c))}</td>
+      <td><span class="st-badge ${ST_CLS[c.status]}">${ST_LBL[c.status]}</span></td>
+      <td><span class="pr-badge ${PR_CLS[c.prioritaet]}"><svg width="11" height="11"><use href="#${PR_ICO[c.prioritaet]}"/></svg>${PR_LBL[c.prioritaet]}</span></td>
+      <td><div class="own-chip"><div class="own-dot ${c.owner==='Christian'?'od-c':'od-p'}">${c.owner[0]}</div>${c.owner}</div></td>
+      <td class="date-cell">${fmt(c.lastContact)}</td>
+      <td><div style="display:flex;flex-wrap:wrap;gap:3px">${(c.tags||[]).map(t=>`<span class="tag">${t}</span>`).join('')}</div></td>
+      <td><div class="act-cell" onclick="event.stopPropagation()">
+        <button class="ico-btn" onclick="openEdit('${c.id}')" title="Bearbeiten"><svg width="13" height="13"><use href="#ic-edit"/></svg></button>
+        <button class="ico-btn del" onclick="delC('${c.id}')" title="Löschen"><svg width="13" height="13"><use href="#ic-trash"/></svg></button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+function toggleSel(id){if(selIds.has(id))selIds.delete(id);else selIds.add(id);renderTable();updateBulkBar();}
+function toggleAll(){const rows=getFiltered();const all=rows.every(c=>selIds.has(c.id));if(all)rows.forEach(c=>selIds.delete(c.id));else rows.forEach(c=>selIds.add(c.id));renderTable();updateBulkBar();}
+function clearSelection(){selIds.clear();renderTable();updateBulkBar();}
+
+function updateBulkBar(){
+  const n=selIds.size;
+  const bar=document.getElementById('bulkBar');
+  bar.classList.toggle('visible',n>0);
+  const bulkCount = document.getElementById('bulkCount');
+  if(bulkCount) bulkCount.textContent=n;
+
+  // populate status dropdown
+  const ST_LBL_LOCAL={neu:'Neu',kontaktiert:'Kontaktiert',antwort:'Antwort',qualifiziert:'Qualifiziert',angebot:'Angebot',gewonnen:'Gewonnen',verloren:'Verloren'};
+  const smenu=document.getElementById('bdStatus-menu');
+  if(smenu) smenu.innerHTML=Object.entries(ST_LBL_LOCAL).map(([k,v])=>
+    `<button class="bulk-dd-item" onclick="bulkSetStatus('${k}')">
+      <span class="st-badge st-${k}" style="font-size:11px">${v}</span>
+    </button>`).join('');
+
+  // populate owner dropdown dynamically from settings
+  const menu=document.getElementById('bdOwner-menu');
+  if(menu) menu.innerHTML=(settings?.users||[{name:'Christian'},{name:'Partner'}]).map(u=>
+    `<button class="bulk-dd-item" onclick="bulkSetOwner('${u.name}')">
+      <div class="own-dot ${u.name==='Christian'?'od-c':'od-p'}" style="width:18px;height:18px;font-size:8px">${u.name[0]}</div>
+      ${u.name}
+    </button>`).join('');
+}
+
+// close dropdowns when clicking outside
+document.addEventListener('click', function(e){
+  document.querySelectorAll('.bulk-dropdown-menu.open').forEach(m=>{
+    if(!m.parentElement.contains(e.target)) m.classList.remove('open');
+  });
+});
+
+function toggleBulkDd(id){
+  const menu=document.getElementById(id+'-menu');
+  const wasOpen=menu.classList.contains('open');
+  document.querySelectorAll('.bulk-dropdown-menu').forEach(m=>m.classList.remove('open'));
+  if(!wasOpen) menu.classList.add('open');
+}
+
+// ── BULK ACTIONS ──────────────────────────────────────────────
+function bulkDelete(){
+  const n=selIds.size;
+  if(!n) return;
+  showConfirm(
+    'Kontakte löschen',
+    `<strong>${n} Kontakt${n>1?'e':''}</strong> werden unwiderruflich gelöscht.`,
+    'Löschen',
+    ()=>{
+      contacts=contacts.filter(c=>!selIds.has(c.id));
+      selIds.clear(); persist(); renderTable(); renderStats(); updateBulkBar();
+      notify(`${n} Kontakt${n>1?'e':''} gelöscht`,'ok');
+    }
+  );
+}
+
+function bulkSetStatus(status){
+  const n=selIds.size; if(!n) return;
+  const ST_LBL_LOCAL={neu:'Neu',kontaktiert:'Kontaktiert',antwort:'Antwort',qualifiziert:'Qualifiziert',angebot:'Angebot',gewonnen:'Gewonnen',verloren:'Verloren'};
+  contacts.forEach(c=>{
+    if(!selIds.has(c.id)) return;
+    const prev=c.status;
+    c.status=status;
+    if(prev!==status){
+      c.notizen=c.notizen||[];
+      c.notizen.unshift({text:`Status: ${ST_LBL_LOCAL[prev]||prev} → ${ST_LBL_LOCAL[status]||status}`,date:today(),user:activeUser,type:'status'});
+    }
+  });
+  persist(); renderTable(); renderStats(); updateBulkBar();
+  document.querySelectorAll('.bulk-dropdown-menu').forEach(m=>m.classList.remove('open'));
+  notify(`${n} Kontakt${n>1?'e':''} → ${ST_LBL_LOCAL[status]}`,'ok');
+}
+
+function bulkSetOwner(owner){
+  const n=selIds.size; if(!n) return;
+  contacts.forEach(c=>{ if(selIds.has(c.id)) c.owner=owner; });
+  persist(); renderTable(); renderStats(); updateBulkBar();
+  document.querySelectorAll('.bulk-dropdown-menu').forEach(m=>m.classList.remove('open'));
+  notify(`${n} Kontakt${n>1?'e':''} → ${owner}`,'ok');
+}
+
+// Bulk Tags
+let _bulkSelectedTags=[];
+
+function openBulkTags(){
+  if(!selIds.size) return;
+  _bulkSelectedTags=[];
+  document.getElementById('bulkTagSub').textContent=`${selIds.size} Kontakt${selIds.size>1?'e':''} ausgewählt`;
+  document.getElementById('bulkTagReplace').checked=false;
+  document.getElementById('bulkTagNew').value='';
+  renderBulkTagList();
+  document.getElementById('bulkTagOverlay').classList.add('open');
+}
+function closeBulkTags(e){
+  if(e&&e.target!==document.getElementById('bulkTagOverlay')) return;
+  document.getElementById('bulkTagOverlay').classList.remove('open');
+}
+function renderBulkTagList(){
+  // All available tags: settings defaults + tags already in use
+  const allTags=[...new Set([...(settings?.defaultTags||[]),...contacts.flatMap(c=>c.tags||[])])].sort();
+  document.getElementById('bulkTagList').innerHTML=allTags.map(t=>{
+    const sel=_bulkSelectedTags.includes(t);
+    return `<span class="btag-chip ${sel?'selected':''}" onclick="toggleBulkTag('${t.replace(/'/g,"\\'")}')">
+      <svg class="check-icon" width="11" height="11"><use href="#ic-check"/></svg>
+      ${t}
+    </span>`;
+  }).join('');
+}
+function toggleBulkTag(t){
+  const idx=_bulkSelectedTags.indexOf(t);
+  if(idx>=0) _bulkSelectedTags.splice(idx,1); else _bulkSelectedTags.push(t);
+  renderBulkTagList();
+}
+function bulkTagAddNew(){
+  const v=document.getElementById('bulkTagNew').value.trim();
+  if(!v) return;
+  if(!_bulkSelectedTags.includes(v)) _bulkSelectedTags.push(v);
+  if(!settings.defaultTags.includes(v)){ settings.defaultTags.push(v); persistSettings(); }
+  document.getElementById('bulkTagNew').value='';
+  renderBulkTagList();
+}
+function applyBulkTags(){
+  if(!_bulkSelectedTags.length){ notify('Bitte mindestens einen Tag wählen','err'); return; }
+  const replace=document.getElementById('bulkTagReplace').checked;
+  const n=selIds.size;
+  contacts.forEach(c=>{
+    if(!selIds.has(c.id)) return;
+    if(replace){ c.tags=[..._bulkSelectedTags]; }
+    else { c.tags=[...new Set([...(c.tags||[]),..._bulkSelectedTags])]; }
+  });
+  persist(); renderTable(); renderStats();
+  document.getElementById('bulkTagOverlay').classList.remove('open');
+  notify(`Tags bei ${n} Kontakt${n>1?'en':''} aktualisiert`,'ok');
+}
+
+// ── MODAL ─────────────────────────────────────────────────────
+function openAdd(){
+  editId=null;
+  document.getElementById('modalTitle').textContent='Kontakt hinzufügen';
+  document.getElementById('saveBtn').textContent='Hinzufügen';
+  clearForm();
+  renderStats(); // ensures f-owner select is populated
+  document.getElementById('f-owner').value=activeUser;
+  document.getElementById('f-date').value=today();
+  document.getElementById('overlay').classList.add('open');
+}
+function openEdit(id){
+  const c=contacts.find(x=>x.id===id);if(!c)return;
+  editId=id;
+  document.getElementById('modalTitle').textContent='Kontakt bearbeiten';
+  document.getElementById('saveBtn').textContent='Speichern';
+  document.getElementById('f-vorname').value=c.vorname||'';
+  document.getElementById('f-nachname').value=c.nachname||'';
+  ['firma','position','branche','email','tel','linkedin'].forEach(k=>document.getElementById('f-'+k).value=c[k]||'');
+  setKanaeleForm(getKanaele(c));
+  document.getElementById('f-status').value=c.status;
+  document.getElementById('f-prio').value=c.prioritaet;
+  document.getElementById('f-owner').value=c.owner;
+  document.getElementById('f-date').value=c.lastContact||'';
+  document.getElementById('f-next').value=c.nextAction||'';
+  clearNaActive();
+  document.getElementById('f-notiz').value='';
+  window._formTags=[...(c.tags||[])];
+  renderFormTags();
+  document.getElementById('overlay').classList.add('open');
+}
+function closeModal(e){if(e&&e.target!==document.getElementById('overlay'))return;document.getElementById('overlay').classList.remove('open');}
+function clearForm(){
+  ['f-vorname','f-nachname','f-firma','f-position','f-branche','f-email','f-tel','f-linkedin','f-notiz','f-next'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  clearKanaeleForm(); clearNaActive();
+  document.getElementById('f-status').value='neu';
+  document.getElementById('f-prio').value='mittel';
+  document.getElementById('f-date').value='';
+  window._formTags=[];
+  renderFormTags();
+}
+function saveContact(){
+  const vorname=document.getElementById('f-vorname').value.trim();
+  const nachname=document.getElementById('f-nachname').value.trim();
+  if(!vorname){notify('Vorname ist erforderlich!','err');return;}
+  const kanaele=readKanaeleForm();
+  if(!kanaele.length){notify('Bitte mindestens einen Kanal wählen!','err');return;}
+  const nt=document.getElementById('f-notiz').value.trim();
+  const lastContact=document.getElementById('f-date').value||today();
+  const vals={
+    vorname, nachname,
+    firma:document.getElementById('f-firma').value.trim(),
+    position:document.getElementById('f-position').value.trim(),
+    branche:document.getElementById('f-branche').value.trim(),
+    email:document.getElementById('f-email').value.trim(),
+    tel:document.getElementById('f-tel').value.trim(),
+    linkedin:document.getElementById('f-linkedin').value.trim(),
+    kanaele,
+    status:document.getElementById('f-status').value,
+    prioritaet:document.getElementById('f-prio').value,
+    owner:document.getElementById('f-owner').value,
+    lastContact,
+    nextAction:document.getElementById('f-next').value,
+    tags: window._formTags||[],
+  };
+  if(editId){
+    const idx=contacts.findIndex(c=>c.id===editId);
+    const prev=contacts[idx]; const prevSt=prev.status;
+    contacts[idx]={...prev,...vals};
+    if(prevSt!==vals.status){contacts[idx].notizen=[...(prev.notizen||[])];contacts[idx].notizen.unshift({text:`Status: ${ST_LBL[prevSt]||prevSt} → ${ST_LBL[vals.status]||vals.status}`,date:today(),user:activeUser,type:'status'});}
+    if(nt){contacts[idx].notizen=contacts[idx].notizen||[];contacts[idx].notizen.unshift({text:nt,date:today(),user:activeUser,type:'note'});}
+    notify('Gespeichert','ok');
+    if(detailId===editId)openDetail(editId);
+  } else {
+    contacts.unshift({id:Date.now().toString(),...vals,notizen:nt?[{text:nt,date:today(),user:activeUser,type:'note'}]:[],createdAt:today()});
+    notify('Kontakt hinzugefügt','ok');
+  }
+  persist();document.getElementById('overlay').classList.remove('open');renderTable();renderStats();
+}
+function delC(id){
+  const c=contacts.find(x=>x.id===id);
+  if(!c) return;
+  showConfirm(
+    'Kontakt löschen',
+    `<strong>${fullName(c)}</strong> wird unwiderruflich gelöscht.`,
+    'Löschen',
+    ()=>{
+      contacts=contacts.filter(x=>x.id!==id);
+      selIds.delete(id);
+      persist(); renderTable(); renderStats(); updateBulkBar();
+      if(detailId===id) closeDetail();
+      notify('Kontakt gelöscht','ok');
+    }
+  );
+}
+
+// ── DETAIL ────────────────────────────────────────────────────
+function openDetail(id){
+  const c=contacts.find(x=>x.id===id);if(!c)return;detailId=id;
+  const [bg,fg]=avc(c);
+  const fn=fullName(c);
+  const tlHtml=(c.notizen||[]).length?(c.notizen||[]).map(n=>`
+    <div class="tl-item">
+      <div class="tl-dot"><svg width="12" height="12" color="${n.type==='status'?'var(--blue)':'var(--text3)'}"><use href="#${n.type==='status'?'ic-swap':'ic-note'}"/></svg></div>
+      <div style="padding-top:4px"><div class="tl-ev">${n.text}</div><div class="tl-dt">${fmt(n.date)} · ${n.user}</div></div>
+    </div>`).join('') : '<div style="font-size:12px;color:var(--text3);padding:2px 0">Noch keine Aktivitäten</div>';
+  document.getElementById('detailContent').innerHTML=`
+    <div class="dp-hd">
+      <div class="dp-av" style="background:${bg};color:${fg};border-color:${bg}">${ini(c)}</div>
+      <div style="flex:1;min-width:0">
+        <div class="dp-name">${c.nachname||''} <span style="font-weight:300">${c.vorname||c.name||''}</span></div>
+        <div class="dp-sub">${c.position||''}${c.firma?' @ '+c.firma:''}</div>
+      </div>
+      <button class="ico-btn" onclick="closeDetail()" style="flex-shrink:0"><svg width="13" height="13"><use href="#ic-x"/></svg></button>
+    </div>
+    <div class="tab-bar">
+      <div class="tab-item active" onclick="dtTab(this,'di')">Info</div>
+      <div class="tab-item" onclick="dtTab(this,'da')">Aktivität</div>
+    </div>
+    <div id="di">
+      <div class="dp-section">
+        <div class="dp-stitle">Status</div>
+        <div class="dp-row"><span class="dp-key">Status</span><span class="st-badge ${ST_CLS[c.status]}">${ST_LBL[c.status]}</span></div>
+        <div class="dp-row"><span class="dp-key">Kanäle</span><div>${kanaeleBadges(getKanaele(c))}</div></div>
+        <div class="dp-row"><span class="dp-key">Priorität</span><span class="pr-badge ${PR_CLS[c.prioritaet]}"><svg width="11" height="11"><use href="#${PR_ICO[c.prioritaet]}"/></svg>${PR_LBL[c.prioritaet]}</span></div>
+        <div class="dp-row"><span class="dp-key">Zuständig</span><div class="own-chip"><div class="own-dot ${c.owner==='Christian'?'od-c':'od-p'}">${c.owner[0]}</div>${c.owner}</div></div>
+        ${(c.tags||[]).length?`<div class="dp-row" style="align-items:flex-start"><span class="dp-key">Tags</span><div style="display:flex;flex-wrap:wrap;gap:4px;justify-content:flex-end">${(c.tags||[]).map(t=>`<span class="tag">${t}</span>`).join('')}</div></div>`:''}
+      </div>
+      <div class="dp-section">
+        <div class="dp-stitle">Kontaktdaten</div>
+        ${c.email?`<div class="dp-row"><span class="dp-key">E-Mail</span><a href="mailto:${c.email}" style="color:var(--accent);font-size:12px;text-decoration:none">${c.email}</a></div>`:''}
+        ${c.tel?`<div class="dp-row"><span class="dp-key">Telefon</span><span class="dp-val">${c.tel}</span></div>`:''}
+        ${c.branche?`<div class="dp-row"><span class="dp-key">Branche</span><span class="dp-val">${c.branche}</span></div>`:''}
+      </div>
+      <div class="dp-section">
+        <div class="dp-stitle">Termine</div>
+        <div class="dp-row"><span class="dp-key">Letzter Kontakt</span><span class="dp-val" style="font-family:'Geist Mono',monospace;font-size:11.5px">${fmt(c.lastContact)}</span></div>
+        <div class="dp-row"><span class="dp-key">Nächste Aktion</span><span class="dp-val" style="font-family:'Geist Mono',monospace;font-size:11.5px;color:${c.nextAction?'var(--accent)':'var(--text3)'}">${fmt(c.nextAction)}</span></div>
+      </div>
+      <div style="padding:12px 18px;display:flex;gap:8px">
+        <button class="btn btn-primary" style="flex:1;justify-content:center" onclick="openEdit('${id}')"><svg width="13" height="13"><use href="#ic-edit"/></svg> Bearbeiten</button>
+        <button class="btn btn-ghost" onclick="switchToActivityTab()" title="Aktivität"><svg width="13" height="13"><use href="#ic-note"/></svg></button>
+        <button class="btn btn-danger" onclick="delC('${id}')" title="Löschen"><svg width="13" height="13"><use href="#ic-trash"/></svg></button>
+      </div>
+    </div>
+    <div id="da" style="display:none">
+      <div class="timeline">${tlHtml}</div>
+      <div class="add-note">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text3);margin-bottom:7px">Notiz hinzufügen</div>
+        <div class="note-row">
+          <textarea id="ni-${id}" placeholder="Notiz eingeben …" rows="2"></textarea>
+          <button class="btn btn-primary" style="align-self:flex-end;padding:7px 12px" onclick="addNote('${id}')"><svg width="13" height="13"><use href="#ic-plus"/></svg></button>
+        </div>
+      </div>
+    </div>
+  `;
+  document.getElementById('detailPanel').classList.add('open');
+}
+
+function dtTab(el, tid) {
+  if(!el) return; // null guard
+  document.querySelectorAll('#detailPanel .tab-item').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  ['di','da'].forEach(id=>{ const e=document.getElementById(id); if(e) e.style.display=id===tid?'block':'none'; });
+}
+
+function switchToActivityTab() {
+  const tabs = document.querySelectorAll('#detailPanel .tab-item');
+  const lastTab = tabs[tabs.length - 1];
+  if(lastTab) dtTab(lastTab, 'da');
+}
+
+function closeDetail(){detailId=null;document.getElementById('detailPanel').classList.remove('open');}
+
+function addNote(id){
+  const inp=document.getElementById('ni-'+id);
+  if(!inp||!inp.value.trim()) return;
+  const c=contacts.find(x=>x.id===id);
+  if(!c) return;
+  c.notizen=c.notizen||[];
+  c.notizen.unshift({text:inp.value.trim(),date:today(),user:activeUser,type:'note'});
+  persist();
+  openDetail(id);
+  switchToActivityTab();
+  notify('Notiz gespeichert','ok');
+}
+
+// ── ANALYTICS ─────────────────────────────────────────────────
+function renderAnalytics(){
+  const all=contacts;
+  const ss=['neu','kontaktiert','antwort','qualifiziert','angebot','gewonnen','verloren'];
+  const stC={neu:'var(--text3)',kontaktiert:'var(--blue)',antwort:'var(--amber)',qualifiziert:'var(--accent)',angebot:'var(--violet)',gewonnen:'var(--teal)',verloren:'var(--red)'};
+  const mx=Math.max(...ss.map(s=>all.filter(c=>c.status===s).length),1);
+  const fnHtml=ss.map(s=>{const cnt=all.filter(c=>c.status===s).length;return`<div class="fn-bar"><div class="fn-lbl"><span>${ST_LBL[s]}</span><span>${cnt}</span></div><div class="fn-track"><div class="fn-fill" style="width:${cnt/mx*100}%;background:${stC[s]}"></div></div></div>`;}).join('');
+  const users = settings?.users || [{name:'Christian',color:'#1a5c3a'},{name:'Partner',color:'#1a3a5c'}];
+  const teamHtml = users.map(u=>{
+    const cnt=all.filter(c=>c.owner===u.name).length;
+    const wonU=all.filter(c=>c.owner===u.name&&c.status==='gewonnen').length;
+    const cr=cnt?Math.round(wonU/cnt*100):0;
+    return `<div class="team-stat">
+      <div class="team-name" style="color:${u.color}">● ${u.name}</div>
+      <div class="team-num" style="color:${u.color}">${cnt}</div>
+      <div class="team-sub">Kontakte gesamt</div>
+      <div class="team-sub" style="margin-top:6px;color:var(--teal);font-weight:600">${cr}% Conversion</div>
+    </div>`;
+  }).join('');
+  const chHtml=['LinkedIn','Email','Telefon'].map(ch=>{const cnt=all.filter(c=>getKanaele(c).includes(ch)).length,won=all.filter(c=>getKanaele(c).includes(ch)&&c.status==='gewonnen').length;const col=ch==='LinkedIn'?'var(--blue)':ch==='Email'?'var(--amber)':'var(--violet)';return`<div class="ch-stat"><div class="ch-ico" style="color:${col}"><svg width="22" height="22"><use href="#${CH_ICO[ch]}"/></svg></div><div class="ch-num">${cnt}</div><div class="ch-lbl">${ch}</div><div class="ch-sub">${won?won+' gewonnen':'—'}</div></div>`;}).join('');
+  const days=['Mo','Di','Mi','Do','Fr','Sa','So'];
+  const wk=days.map((_,i)=>{const d=new Date();d.setDate(d.getDate()-((new Date().getDay()+6-i)%7));return all.filter(c=>c.lastContact===d.toISOString().slice(0,10)).length;});
+  const wMax=Math.max(...wk,1);
+  const prios={hoch:0,mittel:0,niedrig:0};all.forEach(c=>prios[c.prioritaet]=(prios[c.prioritaet]||0)+1);const pT=all.length||1;
+  document.getElementById('analyticsWrap').innerHTML=`
+    <div class="an-card"><div class="an-title">Pipeline Funnel</div>${fnHtml}</div>
+    <div class="an-card"><div class="an-title">Team Vergleich</div><div class="team-grid">${teamHtml}</div></div>
+    <div class="an-card"><div class="an-title">Kanäle</div><div class="ch-grid">${chHtml}</div></div>
+    <div class="an-card"><div class="an-title">Prioritäten</div>${['hoch','mittel','niedrig'].map(p=>`<div class="fn-bar" style="margin-bottom:10px"><div class="fn-lbl"><span style="color:${p==='hoch'?'var(--red)':p==='mittel'?'var(--amber)':'var(--text3)'}">${PR_LBL[p]}</span><span>${prios[p]}</span></div><div class="fn-track"><div class="fn-fill" style="width:${prios[p]/pT*100}%;background:${p==='hoch'?'var(--red)':p==='mittel'?'var(--amber)':'var(--text3)'}"></div></div></div>`).join('')}</div>
+    <div class="an-card an-wide"><div class="an-title">Aktivität diese Woche</div>
+      <div class="wk-bars">${wk.map(v=>`<div class="wk-bar" style="height:${Math.max(v/wMax*100,4)}%;background:${v>0?'var(--accent)':'var(--surface3)'}"></div>`).join('')}</div>
+      <div class="wk-lbls">${days.map(d=>`<div class="wk-lbl">${d}</div>`).join('')}</div>
+    </div>
+  `;
+}
+
+// ── EXPORT ────────────────────────────────────────────────────
+function exportCSV(){
+  const rows=getFiltered();
+  const hdr=['Vorname','Nachname','Firma','Position','Branche','E-Mail','Telefon','Kanäle','Status','Priorität','Zuständig','Tags','Letzter Kontakt','Nächste Aktion'];
+  const csv=[hdr.join(';'),...rows.map(c=>[c.vorname||'',c.nachname||'',c.firma||'',c.position||'',c.branche||'',c.email||'',c.tel||'',getKanaele(c).join('+'),c.status||'',c.prioritaet||'',c.owner||'',(c.tags||[]).join('|'),c.lastContact||'',c.nextAction||''].map(v=>`"${(v||'').replace(/"/g,'""')}"`).join(';'))].join('\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'}));a.download='akquise-export.csv';a.click();
+  notify('CSV exportiert ('+rows.length+' Kontakte)','ok');
+}
+
+// ── TAGS ──────────────────────────────────────────────────────
+window._formTags = [];
+
+function getAllTags() {
+  return [...new Set(contacts.flatMap(c=>c.tags||[]))].sort();
+}
+
+function renderFormTags() {
+  const wrap = document.getElementById('f-tags-wrap');
+  const sug  = document.getElementById('f-tag-suggest');
+  if(!wrap) return;
+  wrap.innerHTML = (window._formTags||[]).map((t,i)=>
+    `<span class="tag">${t}<button class="tag-rm" onclick="removeFormTag(${i})" title="Entfernen">
+      <svg width="10" height="10"><use href="#ic-x"/></svg>
+    </button></span>`
+  ).join('');
+  // suggestions: all existing tags not yet added
+  const existing = getAllTags().filter(t=>!(window._formTags||[]).includes(t));
+  if(sug) sug.innerHTML = existing.slice(0,12).map(t=>
+    `<button type="button" class="tag-sug-btn" onclick="addFormTag('${t.replace(/'/g,"\\'")}')">+ ${t}</button>`
+  ).join('');
+}
+
+function addFormTag(val) {
+  const v = val.trim();
+  if(!v) return;
+  if(!(window._formTags||[]).includes(v)) {
+    window._formTags = [...(window._formTags||[]), v];
+    renderFormTags();
+  }
+  const inp = document.getElementById('f-tag-input');
+  if(inp) inp.value = '';
+}
+
+function removeFormTag(idx) {
+  window._formTags = (window._formTags||[]).filter((_,i)=>i!==idx);
+  renderFormTags();
+}
+
+function addTagFromInput(e) {
+  if(e.key !== 'Enter') return;
+  e.preventDefault && e.preventDefault();
+  const inp = document.getElementById('f-tag-input');
+  if(!inp || !inp.value.trim()) return;
+  addFormTag(inp.value.trim());
+}
+
+// ── IMPORT ────────────────────────────────────────────────────
+const IMP_FIELDS = [
+  { key:'vorname',     label:'Vorname' },
+  { key:'nachname',    label:'Nachname' },
+  { key:'name',        label:'Name (Vollname)' },
+  { key:'firma',       label:'Firma' },
+  { key:'position',    label:'Position' },
+  { key:'branche',     label:'Branche' },
+  { key:'email',       label:'E-Mail' },
+  { key:'tel',         label:'Telefon' },
+  { key:'linkedin',    label:'LinkedIn-URL' },
+  { key:'kanaele',     label:'Kanäle' },
+  { key:'status',      label:'Status' },
+  { key:'prioritaet',  label:'Priorität' },
+  { key:'owner',       label:'Zuständig' },
+  { key:'tags',        label:'Tags' },
+  { key:'lastContact', label:'Letzter Kontakt' },
+  { key:'nextAction',  label:'Nächste Aktion' },
+  { key:'__ignore__',  label:'— Ignorieren —' },
+];
+
+function openImport() {
+  impState = { step:1, headers:[], rows:[], sep:';' };
+  document.getElementById('impStep1').style.display='';
+  document.getElementById('impStep2').style.display='none';
+  document.getElementById('impFileInfo').style.display='none';
+  document.getElementById('impTitle').textContent='CSV importieren — Datei wählen';
+  document.getElementById('impNextBtn').textContent='Weiter';
+  document.getElementById('impNextBtn').innerHTML='<svg width="13" height="13"><use href="#ic-import"/></svg> Weiter';
+  document.getElementById('impResultMsg').style.display='none';
+  document.getElementById('impFileInput').value='';
+  document.getElementById('importOverlay').classList.add('open');
+}
+function closeImport(e) {
+  if(e && e.target!==document.getElementById('importOverlay')) return;
+  document.getElementById('importOverlay').classList.remove('open');
+}
+
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('impDrop').classList.remove('drag');
+  const f = e.dataTransfer.files[0];
+  if(f) handleFileSelect(f);
+}
+
+function handleFileSelect(file) {
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    let text = ev.target.result;
+    // detect separator
+    const firstLine = text.split('\n')[0];
+    impState.sep = (firstLine.match(/;/g)||[]).length >= (firstLine.match(/,/g)||[]).length ? ';' : ',';
+    const parsed = parseCSV(text, impState.sep);
+    if(!parsed.length) { notify('CSV konnte nicht gelesen werden','err'); return; }
+    impState.headers = parsed[0];
+    impState.rows = parsed.slice(1).filter(r=>r.some(c=>c.trim()));
+    // show file info
+    const info = `<div class="imp-file-info">
+      <svg width="16" height="16"><use href="#ic-file-csv"/></svg>
+      <span>${file.name}</span>
+      <span style="margin-left:auto;font-weight:400;color:var(--accent)">${impState.rows.length} Zeilen · ${impState.headers.length} Spalten</span>
+    </div>`;
+    document.getElementById('impFileInfo').innerHTML = info;
+    document.getElementById('impFileInfo').style.display='';
+  };
+  reader.readAsText(file, 'UTF-8');
+}
+
+function parseCSV(text, sep) {
+  const rows = [];
+  const lines = text.replace(/\r\n/g,'\n').replace(/\r/g,'\n').split('\n');
+  for(const line of lines) {
+    if(!line.trim()) continue;
+    const cells = [];
+    let cur = '', inQ = false;
+    for(let i=0;i<line.length;i++) {
+      const ch=line[i];
+      if(ch==='"') { if(inQ && line[i+1]==='"'){cur+='"';i++;} else inQ=!inQ; }
+      else if(ch===sep && !inQ) { cells.push(cur.trim()); cur=''; }
+      else cur+=ch;
+    }
+    cells.push(cur.trim());
+    rows.push(cells);
+  }
+  return rows;
+}
+
+function autoMap(header) {
+  const h = header.toLowerCase().replace(/[^a-zäöü]/g,'');
+  const map = {
+    vorname:['vorname','firstname','first','fname'],
+    nachname:['nachname','lastname','last','lname','surname','name'],
+    name:['vollname','fullname'],
+    firma:['firma','company','unternehmen','organisation','organization'],
+    position:['position','titel','title','jobtitle','rolle','role'],
+    branche:['branche','industry','sektor','sector','bereich'],
+    email:['email','mail','emailadresse','e-mail'],
+    tel:['tel','telefon','phone','mobil','mobile','handy'],
+    linkedin:['linkedin','linkedinurl','linkedinprofil'],
+    kanaele:['kanal','kanaele','channel','channels'],
+    status:['status'],
+    prioritaet:['priorität','prioritaet','priority'],
+    owner:['owner','zuständig','zustandig','verantwortlich'],
+    tags:['tags','tag','kategorie','kategory'],
+    lastContact:['letzter','lastcontact','letztkontakt','letzterkontakt','zuletzt'],
+    nextAction:['nächste','nextaction','naechste','folgeaktion'],
+  };
+  for(const [key, aliases] of Object.entries(map)) {
+    if(aliases.some(a=>h.includes(a))) return key;
+  }
+  return '__ignore__';
+}
+
+function buildMappingUI() {
+  const rows = impState.headers.map((h,i) => {
+    const mapped = autoMap(h);
+    const preview = impState.rows.slice(0,2).map(r=>r[i]||'').filter(Boolean).join(' / ');
+    const opts = IMP_FIELDS.map(f=>`<option value="${f.key}" ${f.key===mapped?'selected':''}>${f.label}</option>`).join('');
+    return `<div>
+      <div class="imp-map-grid">
+        <div class="map-from" title="${h}">${h}</div>
+        <div class="map-arr"><svg width="14" height="14"><use href="#ic-arrow-right"/></svg></div>
+        <select id="map-${i}">${opts}</select>
+      </div>
+      <div class="imp-preview" title="${preview}">${preview||'(leer)'}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('impMapRows').innerHTML = rows;
+}
+
+function impNext() {
+  if(impState.step===1) {
+    if(!impState.headers.length) { notify('Bitte zuerst eine Datei auswählen','err'); return; }
+    impState.step=2;
+    document.getElementById('impStep1').style.display='none';
+    document.getElementById('impStep2').style.display='';
+    document.getElementById('impFileInfo2').innerHTML = document.getElementById('impFileInfo').innerHTML;
+    document.getElementById('impTitle').textContent='CSV importieren — Spalten zuordnen';
+    document.getElementById('impNextBtn').innerHTML='<svg width="13" height="13"><use href="#ic-import"/></svg> Importieren';
+    buildMappingUI();
+  } else {
+    // do the import
+    const mapping = impState.headers.map((_,i) => document.getElementById('map-'+i)?.value||'__ignore__');
+    let added=0, skipped=0;
+    for(const row of impState.rows) {
+      const c = { id:Date.now().toString()+Math.random(), notizen:[], createdAt:today(), tags:[], kanaele:[] };
+      mapping.forEach((field,i) => {
+        const val = (row[i]||'').trim();
+        if(!val || field==='__ignore__') return;
+        if(field==='name') {
+          // split fullname
+          const parts = val.split(' ');
+          c.vorname = parts[0]||'';
+          c.nachname = parts.slice(1).join(' ')||'';
+        } else if(field==='kanaele') {
+          c.kanaele = val.split(/[|+,]/).map(v=>v.trim()).filter(Boolean);
+        } else if(field==='tags') {
+          c.tags = val.split(/[|,]/).map(v=>v.trim()).filter(Boolean);
+        } else {
+          c[field] = val;
+        }
+      });
+      if(!c.vorname && !c.nachname && !c.email) { skipped++; continue; }
+      if(!c.vorname) c.vorname='';
+      if(!c.nachname) c.nachname='';
+      if(!c.kanaele.length) c.kanaele=['LinkedIn'];
+      if(!c.status) c.status='neu';
+      if(!c.prioritaet) c.prioritaet='mittel';
+      if(!c.owner) c.owner=activeUser;
+      contacts.unshift(c);
+      added++;
+    }
+    persist(); renderTable(); renderStats();
+    const msg = `<div class="imp-results">
+      <strong>${added} Kontakte</strong> importiert${skipped?` · ${skipped} übersprungen (kein Name/E-Mail)`:''}
+    </div>`;
+    document.getElementById('impResultMsg').innerHTML=msg;
+    document.getElementById('impResultMsg').style.display='';
+    document.getElementById('impNextBtn').style.display='none';
+    notify(`${added} Kontakte importiert`,'ok');
+  }
+}
+
+// ── SETTINGS ──────────────────────────────────────────────────
+const DEFAULT_SETTINGS = {
+  users: [
+    { id:'u1', name:'Christian', color:'#1a5c3a', role:'Inhaber' },
+    { id:'u2', name:'Partner',   color:'#1a3a5c', role:'Vertrieb' },
+  ],
+  statuses: [
+    { key:'neu',          label:'Neu',              color:'#a09e98' },
+    { key:'kontaktiert',  label:'Kontaktiert',       color:'#1a3a5c' },
+    { key:'antwort',      label:'Antwort erhalten',  color:'#8a5a00' },
+    { key:'qualifiziert', label:'Qualifiziert',       color:'#1a5c3a' },
+    { key:'angebot',      label:'Angebot gesendet',  color:'#5a1a7a' },
+    { key:'gewonnen',     label:'Gewonnen',           color:'#1a6a5a' },
+    { key:'verloren',     label:'Verloren',           color:'#c0392b' },
+  ],
+  branches: ['Maschinenbau','E-Commerce','Logistik','IT-Dienstleistung','Handel','Unternehmensberatung','Software','Immobilien','SaaS','Produktion','Gesundheit','Finanzen'],
+  defaultTags: ['Messe','Warmkontakt','Kaltakquise','Empfehlung','Google Ads','SEO','CRM'],
+};
+
+let settings = JSON.parse(localStorage.getItem('akq_settings') || 'null') || JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
+
+function persistSettings() { localStorage.setItem('akq_settings', JSON.stringify(settings)); }
+
+function renderSettings() {
+  const all = contacts;
+  const lastBackup = localStorage.getItem('akq_last_backup') || '—';
+  const storageKB = Math.round(JSON.stringify(contacts).length / 1024 * 10) / 10;
+
+  document.getElementById('settingsWrap').innerHTML = `
+    <div class="settings-page-title">Einstellungen</div>
+    <div class="settings-page-sub">Team, Pipeline, Tags, Branchen und Datensicherung verwalten</div>
+
+    <div class="settings-grid" style="margin-bottom:20px">
+
+      <!-- TEAM -->
+      <div class="s-card">
+        <div class="s-card-hd">
+          <div class="s-card-icon" style="background:var(--accent-lt);color:var(--accent)"><svg width="16" height="16"><use href="#ic-users"/></svg></div>
+          <div><div class="s-card-title">Team-Mitglieder</div><div class="s-card-sub">Namen und Rollen verwalten</div></div>
+        </div>
+        <div class="s-card-body">
+          <div class="s-list" id="s-users-list"></div>
+          <div class="s-add-row">
+            <input id="s-user-new-name" placeholder="Name …" onkeydown="if(event.key==='Enter')addSettingUser()">
+            <input id="s-user-new-role" placeholder="Rolle …" style="max-width:120px" onkeydown="if(event.key==='Enter')addSettingUser()">
+            <button class="btn btn-primary" style="padding:7px 12px" onclick="addSettingUser()"><svg width="13" height="13"><use href="#ic-plus"/></svg></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- STATUS PIPELINE -->
+      <div class="s-card">
+        <div class="s-card-hd">
+          <div class="s-card-icon" style="background:var(--violet-lt);color:var(--violet)"><svg width="16" height="16"><use href="#ic-pipeline"/></svg></div>
+          <div><div class="s-card-title">Status-Stufen</div><div class="s-card-sub">Reihenfolge und Labels der Pipeline</div></div>
+        </div>
+        <div class="s-card-body">
+          <div class="s-list" id="s-status-list"></div>
+          <div class="s-add-row">
+            <input id="s-status-new-label" placeholder="Neuer Status …" onkeydown="if(event.key==='Enter')addSettingStatus()">
+            <input id="s-status-new-color" type="color" value="#1a5c3a" style="width:38px;height:34px;padding:2px;border-radius:var(--radius);border:1px solid var(--border);cursor:pointer">
+            <button class="btn btn-primary" style="padding:7px 12px" onclick="addSettingStatus()"><svg width="13" height="13"><use href="#ic-plus"/></svg></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAGS -->
+      <div class="s-card">
+        <div class="s-card-hd">
+          <div class="s-card-icon" style="background:var(--amber-lt);color:var(--amber)"><svg width="16" height="16"><use href="#ic-tag"/></svg></div>
+          <div><div class="s-card-title">Standard-Tags</div><div class="s-card-sub">Vorgeschlagene Tags beim Anlegen</div></div>
+        </div>
+        <div class="s-card-body">
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px" id="s-tags-list"></div>
+          <div class="s-add-row">
+            <input id="s-tag-new" placeholder="Neuer Tag …" onkeydown="if(event.key==='Enter')addSettingTag()">
+            <button class="btn btn-primary" style="padding:7px 12px" onclick="addSettingTag()"><svg width="13" height="13"><use href="#ic-plus"/></svg></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- BRANCHEN -->
+      <div class="s-card">
+        <div class="s-card-hd">
+          <div class="s-card-icon" style="background:var(--blue-lt);color:var(--blue)"><svg width="16" height="16"><use href="#ic-chart"/></svg></div>
+          <div><div class="s-card-title">Branchen</div><div class="s-card-sub">Vorgeschlagene Branchen beim Anlegen</div></div>
+        </div>
+        <div class="s-card-body">
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px" id="s-branches-list"></div>
+          <div class="s-add-row">
+            <input id="s-branch-new" placeholder="Neue Branche …" onkeydown="if(event.key==='Enter')addSettingBranch()">
+            <button class="btn btn-primary" style="padding:7px 12px" onclick="addSettingBranch()"><svg width="13" height="13"><use href="#ic-plus"/></svg></button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- BACKUP / DATEN — full width -->
+    <div class="settings-grid single">
+      <div class="s-card">
+        <div class="s-card-hd">
+          <div class="s-card-icon" style="background:var(--teal-lt);color:var(--teal)"><svg width="16" height="16"><use href="#ic-database"/></svg></div>
+          <div><div class="s-card-title">Datensicherung &amp; Wiederherstellung</div><div class="s-card-sub">Kontakte und Einstellungen sichern oder wiederherstellen</div></div>
+        </div>
+        <div class="s-card-body">
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px">
+
+            <div class="s-backup-card">
+              <div class="s-backup-icon"><svg width="28" height="28" color="var(--accent)"><use href="#ic-database"/></svg></div>
+              <div class="s-backup-label">Vollständiges Backup</div>
+              <div class="s-backup-desc">Alle Kontakte + Einstellungen als JSON-Datei exportieren</div>
+              <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="backupFull()">
+                <svg width="13" height="13"><use href="#ic-download"/></svg> Backup erstellen
+              </button>
+            </div>
+
+            <div class="s-backup-card">
+              <div class="s-backup-icon"><svg width="28" height="28" color="var(--blue)"><use href="#ic-restore"/></svg></div>
+              <div class="s-backup-label">Backup wiederherstellen</div>
+              <div class="s-backup-desc">JSON-Backup-Datei laden und Daten wiederherstellen</div>
+              <button class="btn btn-ghost" style="width:100%;justify-content:center" onclick="document.getElementById('restoreInput').click()">
+                <svg width="13" height="13"><use href="#ic-upload"/></svg> Datei wählen
+              </button>
+              <input type="file" id="restoreInput" accept=".json" style="display:none" onchange="restoreBackup(this.files[0])">
+            </div>
+
+            <div class="s-backup-card">
+              <div class="s-backup-icon"><svg width="28" height="28" color="var(--amber)"><use href="#ic-file-csv"/></svg></div>
+              <div class="s-backup-label">CSV exportieren</div>
+              <div class="s-backup-desc">Alle Kontakte als CSV-Tabelle für Excel oder andere Tools</div>
+              <button class="btn btn-ghost" style="width:100%;justify-content:center" onclick="exportCSV()">
+                <svg width="13" height="13"><use href="#ic-download"/></svg> CSV exportieren
+              </button>
+            </div>
+
+          </div>
+
+          <div class="s-divider"></div>
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--text3);margin-bottom:10px">Datenbankübersicht</div>
+          <div class="s-stat-row"><span class="s-stat-key">Kontakte gesamt</span><span class="s-stat-val">${all.length}</span></div>
+          <div class="s-stat-row"><span class="s-stat-key">Gewonnen</span><span class="s-stat-val">${all.filter(c=>c.status==='gewonnen').length}</span></div>
+          <div class="s-stat-row"><span class="s-stat-key">Aktive Tags</span><span class="s-stat-val">${[...new Set(all.flatMap(c=>c.tags||[]))].length}</span></div>
+          <div class="s-stat-row"><span class="s-stat-key">Speicherverbrauch</span><span class="s-stat-val">${storageKB} KB</span></div>
+          <div class="s-stat-row"><span class="s-stat-key">Letztes Backup</span><span class="s-stat-val" style="font-family:'Geist',sans-serif;font-size:12px">${lastBackup}</span></div>
+
+          <div class="s-divider"></div>
+          <div class="s-card danger-zone" style="border-radius:var(--radius)">
+            <div class="s-card-hd" style="padding:10px 14px">
+              <div class="s-card-icon" style="width:26px;height:26px;background:var(--red-lt);color:var(--red)"><svg width="13" height="13"><use href="#ic-warning"/></svg></div>
+              <div style="flex:1"><div class="s-card-title" style="font-size:12.5px">Gefahrenzone</div></div>
+            </div>
+            <div style="padding:10px 14px;display:flex;gap:8px;flex-wrap:wrap">
+              <button class="btn btn-danger" onclick="resetAllData()">
+                <svg width="13" height="13"><use href="#ic-trash"/></svg> Alle Daten löschen
+              </button>
+              <button class="btn btn-ghost" onclick="resetSettings()">
+                <svg width="13" height="13"><use href="#ic-restore"/></svg> Einstellungen zurücksetzen
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  renderSettingsLists();
+}
+
+function renderSettingsLists() {
+  // Users
+  const ul = document.getElementById('s-users-list');
+  if(ul) ul.innerHTML = settings.users.map((u,i)=>`
+    <div class="s-user-card">
+      <div class="avatar" style="background:${u.color}22;color:${u.color};width:32px;height:32px;font-size:13px">${u.name[0]}</div>
+      <div class="s-user-info">
+        <div class="s-user-name" id="s-uname-${i}">${u.name}</div>
+        <div class="s-user-role">${u.role}</div>
+      </div>
+      ${settings.users.length>1?`<button class="ico-btn del" onclick="removeSettingUser(${i})" title="Entfernen"><svg width="12" height="12"><use href="#ic-trash"/></svg></button>`:''}
+    </div>`).join('');
+
+  // Statuses
+  const sl = document.getElementById('s-status-list');
+  if(sl) sl.innerHTML = settings.statuses.map((s,i)=>`
+    <div class="s-item">
+      <div class="s-item-dot" style="background:${s.color}"></div>
+      <span class="s-item-label">${s.label}</span>
+      <span class="s-item-sub" style="font-family:'Geist Mono',monospace;font-size:10px">${s.key}</span>
+      ${i>=5?`<button class="ico-btn del" onclick="removeSettingStatus(${i})" title="Entfernen"><svg width="12" height="12"><use href="#ic-trash"/></svg></button>`:'<div style="width:28px"></div>'}
+    </div>`).join('');
+
+  // Tags
+  const tl = document.getElementById('s-tags-list');
+  if(tl) tl.innerHTML = settings.defaultTags.map((t,i)=>`
+    <span class="tag">${t}<button class="tag-rm" onclick="removeSettingTag(${i})"><svg width="10" height="10"><use href="#ic-x"/></svg></button></span>`).join('');
+
+  // Branches
+  const bl = document.getElementById('s-branches-list');
+  if(bl) bl.innerHTML = settings.branches.map((b,i)=>`
+    <span class="tag">${b}<button class="tag-rm" onclick="removeSettingBranch(${i})"><svg width="10" height="10"><use href="#ic-x"/></svg></button></span>`).join('');
+}
+
+function addSettingUser() {
+  const name = document.getElementById('s-user-new-name').value.trim();
+  const role = document.getElementById('s-user-new-role').value.trim() || 'Vertrieb';
+  if(!name) { notify('Name eingeben','err'); return; }
+  const colors = ['#1a5c3a','#1a3a5c','#8a5a00','#1a6a5a','#5a1a7a','#c0392b'];
+  settings.users.push({ id:'u'+Date.now(), name, role, color: colors[settings.users.length % colors.length] });
+  persistSettings();
+  document.getElementById('s-user-new-name').value='';
+  document.getElementById('s-user-new-role').value='';
+  renderSettingsLists();
+  notify('Team-Mitglied hinzugefügt','ok');
+}
+function removeSettingUser(i) {
+  if(settings.users.length<=1) { notify('Mindestens ein Nutzer erforderlich','err'); return; }
+  settings.users.splice(i,1); persistSettings(); renderSettingsLists();
+}
+
+function addSettingStatus() {
+  const label = document.getElementById('s-status-new-label').value.trim();
+  const color = document.getElementById('s-status-new-color').value;
+  if(!label) { notify('Status-Name eingeben','err'); return; }
+  const key = label.toLowerCase().replace(/[^a-z0-9]/g,'_').slice(0,20);
+  settings.statuses.push({ key, label, color });
+  persistSettings();
+  document.getElementById('s-status-new-label').value='';
+  renderSettingsLists();
+  notify('Status hinzugefügt','ok');
+}
+function removeSettingStatus(i) {
+  if(i<5) { notify('Standard-Status kann nicht gelöscht werden','err'); return; }
+  settings.statuses.splice(i,1); persistSettings(); renderSettingsLists();
+}
+
+function addSettingTag() {
+  const v = document.getElementById('s-tag-new').value.trim();
+  if(!v) return;
+  if(!settings.defaultTags.includes(v)) { settings.defaultTags.push(v); persistSettings(); }
+  document.getElementById('s-tag-new').value='';
+  renderSettingsLists();
+}
+function removeSettingTag(i) { settings.defaultTags.splice(i,1); persistSettings(); renderSettingsLists(); }
+
+function addSettingBranch() {
+  const v = document.getElementById('s-branch-new').value.trim();
+  if(!v) return;
+  if(!settings.branches.includes(v)) { settings.branches.push(v); persistSettings(); }
+  document.getElementById('s-branch-new').value='';
+  renderSettingsLists();
+}
+function removeSettingBranch(i) { settings.branches.splice(i,1); persistSettings(); renderSettingsLists(); }
+
+// ── BACKUP / RESTORE ──────────────────────────────────────────
+function backupFull() {
+  const payload = { version:'akq_v6', timestamp: new Date().toISOString(), contacts, settings };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
+  const d = new Date().toISOString().slice(0,10);
+  const a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`akquise-backup-${d}.json`; a.click();
+  localStorage.setItem('akq_last_backup', new Date().toLocaleString('de-DE'));
+  notify('Backup erstellt ✓','ok');
+  setTimeout(()=>renderSettings(),300);
+}
+
+function restoreBackup(file) {
+  if(!file) return;
+  const r = new FileReader();
+  r.onload = function(e) {
+    try {
+      const data = JSON.parse(e.target.result);
+      if(!data.contacts || !Array.isArray(data.contacts)) { notify('Ungültige Backup-Datei','err'); return; }
+      const ts = data.timestamp?.slice(0,10)||'?';
+      showConfirm(
+        'Backup wiederherstellen',
+        `Backup vom <strong>${ts}</strong> laden? <br>${data.contacts.length} Kontakte werden importiert — aktuelle Daten werden überschrieben.`,
+        'Wiederherstellen',
+        ()=>{
+          contacts = data.contacts;
+          if(data.settings) { settings = data.settings; persistSettings(); }
+          persist(); renderTable(); renderStats(); renderSettings();
+          notify(`${contacts.length} Kontakte wiederhergestellt ✓`,'ok');
+        }
+      );
+    } catch(err) { notify('Fehler beim Lesen der Datei','err'); }
+  };
+  r.readAsText(file);
+}
+
+function resetAllData() {
+  showConfirm(
+    'Alle Daten löschen',
+    'Wirklich <strong>alle Kontakte</strong> unwiderruflich löschen? Diese Aktion kann nicht rückgängig gemacht werden.',
+    'Alles löschen',
+    ()=>{ contacts=[]; persist(); renderTable(); renderStats(); renderSettings(); notify('Alle Daten gelöscht','ok'); }
+  );
+}
+function resetSettings() {
+  showConfirm(
+    'Einstellungen zurücksetzen',
+    'Einstellungen auf Standardwerte zurücksetzen?',
+    'Zurücksetzen',
+    ()=>{ settings=JSON.parse(JSON.stringify(DEFAULT_SETTINGS)); persistSettings(); renderSettings(); notify('Einstellungen zurückgesetzt','ok'); }
+  );
+}
+
+// ── CUSTOM CONFIRM (replaces browser confirm() which is blocked in iframes) ──
+let _confirmCallback = null;
+function showConfirm(title, msg, okLabel, cb) {
+  document.getElementById('confirmTitle').textContent = title;
+  document.getElementById('confirmMsg').innerHTML = msg;
+  document.getElementById('confirmOkBtn').textContent = okLabel;
+  _confirmCallback = cb;
+  document.getElementById('confirmOverlay').classList.add('open');
+}
+function confirmResolve(ok) {
+  document.getElementById('confirmOverlay').classList.remove('open');
+  if(ok && _confirmCallback) _confirmCallback();
+  _confirmCallback = null;
+}
+
+// ── NOTIFY ────────────────────────────────────────────────────
+function notify(msg,type=''){const el=document.getElementById('notif');el.textContent=msg;el.className='notif show '+type;clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),2500);}
+
+// ── INIT ──────────────────────────────────────────────────────
+initUser(); renderTable(); renderStats(); updateBulkBar();
+</script>
+</body>
+</html>
