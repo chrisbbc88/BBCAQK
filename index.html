@@ -920,6 +920,19 @@ function fullName(c) { return ((c.vorname||c.name||'')+' '+(c.nachname||'')).tri
 function avc(c) { const n=fullName(c); let h=0; for(let ch of n) h+=ch.charCodeAt(0); return AVC[h%AVC.length]; }
 function ini(c) { const v=(c.vorname||c.name||'')[0]||''; const n=(c.nachname||'')[0]||''; return (v+n).toUpperCase()||'?'; }
 function fmt(d) { if(!d) return '—'; return new Date(d).toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'}); }
+
+// Returns [bg, fg] colors for an owner name from settings
+function ownerColors(name) {
+  const users = settings?.users || [];
+  const u = users.find(u=>u.name===name);
+  const col = u?.color || '#1a5c3a';
+  return [col+'22', col];
+}
+// Returns CSS class-like inline styles for owner chip dot
+function ownerDotStyle(name) {
+  const [bg,fg] = ownerColors(name);
+  return `background:${bg};color:${fg}`;
+}
 function today() { return new Date().toISOString().slice(0,10); }
 function persist() { localStorage.setItem('akq_v6', JSON.stringify(contacts)); }
 
@@ -966,9 +979,16 @@ const PR_LBL = { hoch:'Hoch', mittel:'Mittel', niedrig:'Niedrig' };
 // ── USER ──────────────────────────────────────────────────────
 function initUser() {
   const av = document.getElementById('avBig');
+  if(!av) return;
   av.textContent = activeUser[0];
-  av.className = 'avatar ' + (activeUser==='Christian'?'av-c':'av-p');
-  document.getElementById('uName').textContent = activeUser;
+  const users = settings?.users || [];
+  const u = users.find(u=>u.name===activeUser);
+  const col = u?.color || '#1a5c3a';
+  av.style.background = col+'22';
+  av.style.color = col;
+  av.className = 'avatar';
+  const uName = document.getElementById('uName');
+  if(uName) uName.textContent = activeUser;
 }
 function toggleUser() {
   const users = settings?.users || [{name:'Christian'},{name:'Partner'}];
@@ -1001,9 +1021,10 @@ function setFilter(type, val, el) {
 function filterByTag(el) {
   const tag = el.getAttribute('data-tag');
   if(!tag) return;
-  // toggle: clicking the same tag again resets
   if(flt.type==='tag' && flt.val===tag) { resetFilter(); return; }
   flt={type:'tag', val:tag};
+  // clear static sidebar active states; dynamic ones (sbTags/sbTeam) are rebuilt by renderStats
+  document.querySelectorAll('.sidebar .sb-item[onclick]').forEach(e=>e.classList.remove('active'));
   renderTable(); renderStats(); renderPills();
 }
 function filterByOwner(el) {
@@ -1011,6 +1032,7 @@ function filterByOwner(el) {
   if(!owner) return;
   if(flt.type==='owner' && flt.val===owner) { resetFilter(); return; }
   flt={type:'owner', val:owner};
+  document.querySelectorAll('.sidebar .sb-item[onclick]').forEach(e=>e.classList.remove('active'));
   renderTable(); renderStats(); renderPills();
 }
 function renderPills() {
@@ -1141,7 +1163,7 @@ function renderTable() {
       <td>${kanaeleBadges(getKanaele(c))}</td>
       <td><span class="st-badge ${ST_CLS[c.status]}">${ST_LBL[c.status]}</span></td>
       <td><span class="pr-badge ${PR_CLS[c.prioritaet]}"><svg width="11" height="11"><use href="#${PR_ICO[c.prioritaet]}"/></svg>${PR_LBL[c.prioritaet]}</span></td>
-      <td><div class="own-chip"><div class="own-dot ${c.owner==='Christian'?'od-c':'od-p'}">${c.owner[0]}</div>${c.owner}</div></td>
+      <td><div class="own-chip"><div class="own-dot" style="${ownerDotStyle(c.owner)}">${c.owner[0]}</div>${c.owner}</div></td>
       <td class="date-cell">${fmt(c.lastContact)}</td>
       <td><div style="display:flex;flex-wrap:wrap;gap:3px">${(c.tags||[]).map(t=>`<span class="tag">${t}</span>`).join('')}</div></td>
       <td><div class="act-cell" onclick="event.stopPropagation()">
@@ -1413,7 +1435,7 @@ function openDetail(id){
         <div class="dp-row"><span class="dp-key">Status</span><span class="st-badge ${ST_CLS[c.status]}">${ST_LBL[c.status]}</span></div>
         <div class="dp-row"><span class="dp-key">Kanäle</span><div>${kanaeleBadges(getKanaele(c))}</div></div>
         <div class="dp-row"><span class="dp-key">Priorität</span><span class="pr-badge ${PR_CLS[c.prioritaet]}"><svg width="11" height="11"><use href="#${PR_ICO[c.prioritaet]}"/></svg>${PR_LBL[c.prioritaet]}</span></div>
-        <div class="dp-row"><span class="dp-key">Zuständig</span><div class="own-chip"><div class="own-dot ${c.owner==='Christian'?'od-c':'od-p'}">${c.owner[0]}</div>${c.owner}</div></div>
+        <div class="dp-row"><span class="dp-key">Zuständig</span><div class="own-chip"><div class="own-dot" style="${ownerDotStyle(c.owner)}">${c.owner[0]}</div>${c.owner}</div></div>
         ${(c.tags||[]).length?`<div class="dp-row" style="align-items:flex-start"><span class="dp-key">Tags</span><div style="display:flex;flex-wrap:wrap;gap:4px;justify-content:flex-end">${(c.tags||[]).map(t=>`<span class="tag">${t}</span>`).join('')}</div></div>`:''}
       </div>
       <div class="dp-section">
@@ -1513,11 +1535,14 @@ function renderAnalytics(){
 
 // ── EXPORT ────────────────────────────────────────────────────
 function exportCSV(){
-  const rows=getFiltered();
+  const useSelection = selIds.size > 0;
+  const rows = useSelection
+    ? contacts.filter(c=>selIds.has(c.id))
+    : getFiltered();
   const hdr=['Vorname','Nachname','Firma','Position','Branche','E-Mail','Telefon','Kanäle','Status','Priorität','Zuständig','Tags','Letzter Kontakt','Nächste Aktion'];
   const csv=[hdr.join(';'),...rows.map(c=>[c.vorname||'',c.nachname||'',c.firma||'',c.position||'',c.branche||'',c.email||'',c.tel||'',getKanaele(c).join('+'),c.status||'',c.prioritaet||'',c.owner||'',(c.tags||[]).join('|'),c.lastContact||'',c.nextAction||''].map(v=>`"${(v||'').replace(/"/g,'""')}"`).join(';'))].join('\n');
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'}));a.download='akquise-export.csv';a.click();
-  notify('CSV exportiert ('+rows.length+' Kontakte)','ok');
+  notify(rows.length+' Kontakte exportiert'+(useSelection?' (Auswahl)':''),'ok');
 }
 
 // ── TAGS ──────────────────────────────────────────────────────
@@ -1594,8 +1619,8 @@ function openImport() {
   document.getElementById('impStep2').style.display='none';
   document.getElementById('impFileInfo').style.display='none';
   document.getElementById('impTitle').textContent='CSV importieren — Datei wählen';
-  document.getElementById('impNextBtn').textContent='Weiter';
   document.getElementById('impNextBtn').innerHTML='<svg width="13" height="13"><use href="#ic-import"/></svg> Weiter';
+  document.getElementById('impNextBtn').style.display='';
   document.getElementById('impResultMsg').style.display='none';
   document.getElementById('impFileInput').value='';
   document.getElementById('importOverlay').classList.add('open');
@@ -1637,6 +1662,8 @@ function handleFileSelect(file) {
 }
 
 function parseCSV(text, sep) {
+  // Strip UTF-8 BOM (Excel often adds \uFEFF at start)
+  text = text.replace(/^\uFEFF/, '');
   const rows = [];
   const lines = text.replace(/\r\n/g,'\n').replace(/\r/g,'\n').split('\n');
   for(const line of lines) {
@@ -1967,7 +1994,15 @@ function addSettingUser() {
 }
 function removeSettingUser(i) {
   if(settings.users.length<=1) { notify('Mindestens ein Nutzer erforderlich','err'); return; }
-  settings.users.splice(i,1); persistSettings(); renderSettingsLists();
+  const removed = settings.users[i].name;
+  settings.users.splice(i,1);
+  // Reassign contacts that belonged to removed user
+  const fallback = settings.users[0].name;
+  contacts.forEach(c=>{ if(c.owner===removed) c.owner=fallback; });
+  persist(); persistSettings();
+  renderSettingsLists();
+  renderStats();
+  notify(`${removed} entfernt — Kontakte übertragen an ${fallback}`, 'ok');
 }
 
 function addSettingStatus() {
