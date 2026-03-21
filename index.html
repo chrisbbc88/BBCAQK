@@ -2110,26 +2110,63 @@ function handleDrop(e) {
 function handleFileSelect(file) {
   if(!file) return;
   impState = { step:1, headers:[], rows:[], sep:';' };
-  const reader = new FileReader();
-  reader.onload = function(ev) {
-    let text = ev.target.result;
-    // detect separator
-    const firstLine = text.replace(/^\uFEFF/,'').split('\n')[0];
-    impState.sep = (firstLine.match(/;/g)||[]).length >= (firstLine.match(/,/g)||[]).length ? ';' : ',';
-    const parsed = parseCSV(text, impState.sep);
-    if(!parsed.length || parsed[0].length < 1) {
-      notify('CSV konnte nicht gelesen werden — bitte Format prüfen','err');
+
+  // Try UTF-8 first, fall back to Latin-1 if parsing produces garbage
+  const tryParse = (text) => {
+    // Strip BOM
+    text = text.replace(/^\uFEFF/, '');
+    // Normalize line endings
+    text = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+
+    // Detect separator from first non-empty line
+    const firstLine = text.split('\n').find(l => l.trim()) || '';
+    const semiCount  = (firstLine.match(/;/g)  || []).length;
+    const commaCount = (firstLine.match(/,/g)  || []).length;
+    const tabCount   = (firstLine.match(/\t/g) || []).length;
+    let sep = ';';
+    if(tabCount > semiCount && tabCount > commaCount) sep = '\t';
+    else if(commaCount > semiCount) sep = ',';
+    impState.sep = sep;
+
+    const parsed = parseCSV(text, sep);
+    return parsed;
+  };
+
+  const process = (text) => {
+    const parsed = tryParse(text);
+
+    // Debug info in console
+    console.log('Import debug:', {
+      totalRows: parsed.length,
+      sep: impState.sep,
+      firstRow: parsed[0],
+      secondRow: parsed[1],
+    });
+
+    if(!parsed.length) {
+      notify('CSV leer oder unlesbar','err');
       const fi = document.getElementById('impFileInput'); if(fi) fi.value='';
       return;
     }
-    impState.headers = parsed[0];
-    impState.rows = parsed.slice(1).filter(r=>r.some(c=>c.trim()));
+
+    impState.headers = parsed[0].map(h => h || '(leer)');
+    // Data rows: all rows after header that have at least one non-empty cell
+    impState.rows = parsed.slice(1).filter(r => r.length > 0 && r.some(c => (c||'').trim() !== ''));
+
+    if(!impState.headers.length) {
+      notify('Keine Spalten erkannt — bitte Dateiformat prüfen','err');
+      const fi = document.getElementById('impFileInput'); if(fi) fi.value='';
+      return;
+    }
+
     if(!impState.rows.length) {
-      notify('CSV enthält keine Datenzeilen','err');
+      // Show more detail to help diagnose
+      notify(`Spalten erkannt (${impState.headers.length}), aber keine Datenzeilen gefunden. Prüfe ob Zeile 1 die Kopfzeile ist.`, 'err');
       const fi = document.getElementById('impFileInput'); if(fi) fi.value='';
       return;
     }
-    // Store file info for display in modal
+
+    // Store file info for modal
     const infoEl = document.getElementById('_impFileInfoTemp') || (() => {
       const el = document.createElement('div'); el.id='_impFileInfoTemp'; el.style.display='none';
       document.body.appendChild(el); return el;
@@ -2137,36 +2174,71 @@ function handleFileSelect(file) {
     infoEl.innerHTML = `<div class="imp-file-info">
       <svg width="16" height="16"><use href="#ic-file-csv"/></svg>
       <span>${file.name}</span>
-      <span style="margin-left:auto;font-weight:400;color:var(--accent)">${impState.rows.length} Zeilen · ${impState.headers.length} Spalten</span>
+      <span style="margin-left:auto;font-weight:400;color:var(--accent)">${impState.rows.length} Datenzeilen · ${impState.headers.length} Spalten · Trennzeichen: "${impState.sep === '\t' ? 'Tab' : impState.sep}"</span>
     </div>`;
-    notify(`${file.name} gelesen (${impState.rows.length} Zeilen)`,'ok');
+
+    notify(`${file.name}: ${impState.rows.length} Zeilen erkannt`, 'ok');
     openImportModal();
   };
-  reader.onerror = () => {
-    notify('Fehler beim Lesen der Datei','err');
+
+  // Read as UTF-8
+  const readerUTF8 = new FileReader();
+  readerUTF8.onload = (ev) => process(ev.target.result);
+  readerUTF8.onerror = () => {
+    notify('Fehler beim Lesen der Datei', 'err');
     const fi = document.getElementById('impFileInput'); if(fi) fi.value='';
   };
-  reader.readAsText(file, 'UTF-8');
+  readerUTF8.readAsText(file, 'UTF-8');
 }
 
 function parseCSV(text, sep) {
-  // Strip UTF-8 BOM (Excel often adds \uFEFF at start)
-  text = text.replace(/^\uFEFF/, '');
   const rows = [];
-  const lines = text.replace(/\r\n/g,'\n').replace(/\r/g,'\n').split('\n');
-  for(const line of lines) {
-    if(!line.trim()) continue;
+  const lines = text.split('\n');
+
+  for(let li = 0; li < lines.length; li++) {
+    const line = lines[li];
+    // Skip truly empty lines
+    if(line.trim() === '') continue;
+
     const cells = [];
-    let cur = '', inQ = false;
-    for(let i=0;i<line.length;i++) {
-      const ch=line[i];
-      if(ch==='"') { if(inQ && line[i+1]==='"'){cur+='"';i++;} else inQ=!inQ; }
-      else if(ch===sep && !inQ) { cells.push(cur.trim()); cur=''; }
-      else cur+=ch;
+    let cur = '';
+    let inQ = false;
+    let i = 0;
+
+    while(i < line.length) {
+      const ch = line[i];
+
+      if(ch === '"') {
+        if(inQ) {
+          // Check for escaped quote ""
+          if(i + 1 < line.length && line[i+1] === '"') {
+            cur += '"';
+            i += 2;
+            continue;
+          } else {
+            inQ = false;
+          }
+        } else {
+          inQ = true;
+        }
+        i++;
+      } else if(ch === sep && !inQ) {
+        cells.push(cur.trim());
+        cur = '';
+        i++;
+      } else {
+        cur += ch;
+        i++;
+      }
     }
     cells.push(cur.trim());
-    rows.push(cells);
+
+    // Only add row if it has content (not just separators producing empty strings)
+    if(cells.some(c => c !== '')) {
+      rows.push(cells);
+    }
   }
+
   return rows;
 }
 
@@ -2197,20 +2269,42 @@ function autoMap(header) {
 }
 
 function buildMappingUI() {
-  const rows = impState.headers.map((h,i) => {
+  const headers = impState.headers;
+  const previewRows = impState.rows.slice(0, 3);
+
+  // Build mapping rows - each CSV column gets a dropdown to map to a tracker field
+  const mappingRows = headers.map((h, i) => {
     const mapped = autoMap(h);
-    const preview = impState.rows.slice(0,2).map(r=>r[i]||'').filter(Boolean).join(' / ');
-    const opts = IMP_FIELDS.map(f=>`<option value="${f.key}" ${f.key===mapped?'selected':''}>${f.label}</option>`).join('');
-    return `<div>
-      <div class="imp-map-grid">
+    const opts = IMP_FIELDS.map(f =>
+      `<option value="${f.key}" ${f.key===mapped?'selected':''}>${f.label}</option>`
+    ).join('');
+    // Preview: show first 3 values from this column
+    const previews = previewRows.map(r => (r[i]||'').trim()).filter(Boolean);
+    const previewText = previews.length ? previews.join(' · ') : '(leer)';
+
+    return `<div class="imp-map-grid">
+      <div style="display:flex;flex-direction:column;gap:2px;min-width:0">
         <div class="map-from" title="${h}">${h}</div>
-        <div class="map-arr"><svg width="14" height="14"><use href="#ic-arrow-right"/></svg></div>
-        <select id="map-${i}">${opts}</select>
+        <div class="imp-preview">${previewText}</div>
       </div>
-      <div class="imp-preview" title="${preview}">${preview||'(leer)'}</div>
+      <div class="map-arr" style="flex-shrink:0"><svg width="14" height="14"><use href="#ic-arrow-right"/></svg></div>
+      <div class="sel-w" style="min-width:0">
+        <select id="map-${i}" style="width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:var(--radius);font-family:'Geist',sans-serif;font-size:12.5px;outline:none;-webkit-appearance:none">
+          ${opts}
+        </select>
+      </div>
     </div>`;
   }).join('');
-  document.getElementById('impMapRows').innerHTML = rows;
+
+  document.getElementById('impMapRows').innerHTML = `
+    <div style="font-size:11px;color:var(--text3);margin-bottom:12px;line-height:1.5">
+      Ordne jede Spalte aus deiner CSV dem passenden Feld im Tracker zu.
+      Nicht benötigte Spalten auf <strong>„— Ignorieren —"</strong> lassen.
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      ${mappingRows}
+    </div>
+  `;
 }
 
 function impNext() {
