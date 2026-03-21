@@ -938,9 +938,15 @@
       <button class="btn btn-primary" onclick="openAdd()">
         <svg width="13" height="13"><use href="#ic-plus"/></svg> Kontakt
       </button>
-      <button class="btn btn-ghost" onclick="openImport()">
-        <svg width="13" height="13"><use href="#ic-import"/></svg> Import
-      </button>
+      <div style="position:relative;display:inline-flex">
+        <div class="btn btn-ghost" style="pointer-events:none">
+          <svg width="13" height="13"><use href="#ic-import"/></svg> Import
+        </div>
+        <input type="file" id="impFileInput" accept=".csv,text/csv"
+          onchange="handleFileSelect(this.files[0])"
+          style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;font-size:0"
+          title="CSV-Datei importieren">
+      </div>
       <button class="btn btn-ghost" onclick="exportCSV()">
         <svg width="13" height="13"><use href="#ic-download"/></svg> Export
       </button>
@@ -1130,28 +1136,12 @@
 <div class="overlay" id="importOverlay" onclick="closeImport(event)">
   <div class="modal imp-modal" onclick="event.stopPropagation()">
     <div class="modal-hd">
-      <div class="modal-title" id="importTitle">CSV importieren</div>
+      <div class="modal-title" id="importTitle">CSV importieren — Spalten zuordnen</div>
       <button class="ico-btn" onclick="closeImport()"><svg width="13" height="13"><use href="#ic-x"/></svg></button>
     </div>
     <div style="padding:20px 22px" id="importBody">
-      <!-- Step 1: Upload -->
-      <div id="impStep1">
-        <div class="imp-drop" id="impDrop"
-          ondragover="event.preventDefault();this.classList.add('drag')"
-          ondragleave="this.classList.remove('drag')"
-          ondrop="handleDrop(event)"
-          style="position:relative">
-          <div class="imp-drop-icon"><svg width="32" height="32"><use href="#ic-file-csv"/></svg></div>
-          <div class="imp-drop-txt">CSV-Datei auswählen oder hier ablegen</div>
-          <div class="imp-drop-sub">Trennzeichen: Semikolon (;) oder Komma (,) · UTF-8</div>
-          <input type="file" id="impFileInput" accept=".csv,text/csv"
-            onchange="handleFileSelect(this.files[0])"
-            style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;font-size:0">
-        </div>
-        <div id="impFileInfo" style="display:none;margin-top:12px"></div>
-      </div>
-      <!-- Step 2: Mapping -->
-      <div id="impStep2" style="display:none">
+      <!-- Mapping Step (step 1 file picker is now in the toolbar) -->
+      <div id="impStep2">
         <div id="impFileInfo2" style="margin-bottom:14px"></div>
         <div class="imp-map-hdr">
           <span>Spalte in CSV-Datei</span><span></span><span>Feld im Tracker</span>
@@ -2086,53 +2076,75 @@ const IMP_FIELDS = [
 ];
 
 function openImport() {
-  impState = { step:1, headers:[], rows:[], sep:';' };
-  document.getElementById('impStep1').style.display='';
-  document.getElementById('impStep2').style.display='none';
-  document.getElementById('impFileInfo').style.display='none';
-  document.getElementById('impFileInfo').innerHTML='';
-  document.getElementById('impTitle').textContent='CSV importieren — Datei wählen';
-  document.getElementById('impNextBtn').innerHTML='<svg width="13" height="13"><use href="#ic-import"/></svg> Weiter';
-  document.getElementById('impNextBtn').style.display='';
-  document.getElementById('impResultMsg').style.display='none';
-  const fi = document.getElementById('impFileInput');
-  if(fi) fi.value='';
-  const drop = document.getElementById('impDrop');
-  if(drop) drop.classList.remove('drag');
+  // No-op: import is now triggered by file input in toolbar
+}
+
+function openImportModal() {
+  // Opens the mapping step after file is parsed
+  impState.step = 2;
+  const infoEl = document.getElementById('_impFileInfoTemp');
+  const infoEl2 = document.getElementById('impFileInfo2');
+  if(infoEl && infoEl2) infoEl2.innerHTML = infoEl.innerHTML;
+  document.getElementById('impTitle').textContent = 'CSV importieren — Spalten zuordnen';
+  document.getElementById('impNextBtn').innerHTML = '<svg width="13" height="13"><use href="#ic-import"/></svg> Importieren';
+  document.getElementById('impNextBtn').style.display = '';
+  document.getElementById('impResultMsg').style.display = 'none';
+  buildMappingUI();
   document.getElementById('importOverlay').classList.add('open');
 }
+
 function closeImport(e) {
   if(e && e.target!==document.getElementById('importOverlay')) return;
   document.getElementById('importOverlay').classList.remove('open');
+  // Reset file input so same file can be selected again
+  const fi = document.getElementById('impFileInput');
+  if(fi) fi.value='';
 }
 
 function handleDrop(e) {
   e.preventDefault();
-  document.getElementById('impDrop').classList.remove('drag');
   const f = e.dataTransfer.files[0];
   if(f) handleFileSelect(f);
 }
 
 function handleFileSelect(file) {
   if(!file) return;
+  impState = { step:1, headers:[], rows:[], sep:';' };
   const reader = new FileReader();
   reader.onload = function(ev) {
     let text = ev.target.result;
     // detect separator
-    const firstLine = text.split('\n')[0];
+    const firstLine = text.replace(/^\uFEFF/,'').split('\n')[0];
     impState.sep = (firstLine.match(/;/g)||[]).length >= (firstLine.match(/,/g)||[]).length ? ';' : ',';
     const parsed = parseCSV(text, impState.sep);
-    if(!parsed.length) { notify('CSV konnte nicht gelesen werden','err'); return; }
+    if(!parsed.length || parsed[0].length < 1) {
+      notify('CSV konnte nicht gelesen werden — bitte Format prüfen','err');
+      const fi = document.getElementById('impFileInput'); if(fi) fi.value='';
+      return;
+    }
     impState.headers = parsed[0];
     impState.rows = parsed.slice(1).filter(r=>r.some(c=>c.trim()));
-    // show file info
-    const info = `<div class="imp-file-info">
+    if(!impState.rows.length) {
+      notify('CSV enthält keine Datenzeilen','err');
+      const fi = document.getElementById('impFileInput'); if(fi) fi.value='';
+      return;
+    }
+    // Store file info for display in modal
+    const infoEl = document.getElementById('_impFileInfoTemp') || (() => {
+      const el = document.createElement('div'); el.id='_impFileInfoTemp'; el.style.display='none';
+      document.body.appendChild(el); return el;
+    })();
+    infoEl.innerHTML = `<div class="imp-file-info">
       <svg width="16" height="16"><use href="#ic-file-csv"/></svg>
       <span>${file.name}</span>
       <span style="margin-left:auto;font-weight:400;color:var(--accent)">${impState.rows.length} Zeilen · ${impState.headers.length} Spalten</span>
     </div>`;
-    document.getElementById('impFileInfo').innerHTML = info;
-    document.getElementById('impFileInfo').style.display='';
+    notify(`${file.name} gelesen (${impState.rows.length} Zeilen)`,'ok');
+    openImportModal();
+  };
+  reader.onerror = () => {
+    notify('Fehler beim Lesen der Datei','err');
+    const fi = document.getElementById('impFileInput'); if(fi) fi.value='';
   };
   reader.readAsText(file, 'UTF-8');
 }
@@ -2202,56 +2214,47 @@ function buildMappingUI() {
 }
 
 function impNext() {
-  if(impState.step===1) {
-    if(!impState.headers.length) { notify('Bitte zuerst eine Datei auswählen','err'); return; }
-    impState.step=2;
-    document.getElementById('impStep1').style.display='none';
-    document.getElementById('impStep2').style.display='';
-    document.getElementById('impFileInfo2').innerHTML = document.getElementById('impFileInfo').innerHTML;
-    document.getElementById('impTitle').textContent='CSV importieren — Spalten zuordnen';
-    document.getElementById('impNextBtn').innerHTML='<svg width="13" height="13"><use href="#ic-import"/></svg> Importieren';
-    buildMappingUI();
-  } else {
-    // do the import
-    const mapping = impState.headers.map((_,i) => document.getElementById('map-'+i)?.value||'__ignore__');
-    let added=0, skipped=0;
-    for(const row of impState.rows) {
-      const c = { id:Date.now().toString()+Math.random(), notizen:[], createdAt:today(), tags:[], kanaele:[] };
-      mapping.forEach((field,i) => {
-        const val = (row[i]||'').trim();
-        if(!val || field==='__ignore__') return;
-        if(field==='name') {
-          // split fullname
-          const parts = val.split(' ');
-          c.vorname = parts[0]||'';
-          c.nachname = parts.slice(1).join(' ')||'';
-        } else if(field==='kanaele') {
-          c.kanaele = val.split(/[|+,]/).map(v=>v.trim()).filter(Boolean);
-        } else if(field==='tags') {
-          c.tags = val.split(/[|,]/).map(v=>v.trim()).filter(Boolean);
-        } else {
-          c[field] = val;
-        }
-      });
-      if(!c.vorname && !c.nachname && !c.email) { skipped++; continue; }
-      if(!c.vorname) c.vorname='';
-      if(!c.nachname) c.nachname='';
-      if(!c.kanaele.length) c.kanaele=['LinkedIn'];
-      if(!c.status) c.status='neu';
-      if(!c.prioritaet) c.prioritaet='mittel';
-      if(!c.owner) c.owner=activeUser;
-      contacts.unshift(c);
-      added++;
-    }
-    persist(); renderTable(); renderStats();
-    const msg = `<div class="imp-results">
-      <strong>${added} Kontakte</strong> importiert${skipped?` · ${skipped} übersprungen (kein Name/E-Mail)`:''}
-    </div>`;
-    document.getElementById('impResultMsg').innerHTML=msg;
-    document.getElementById('impResultMsg').style.display='';
-    document.getElementById('impNextBtn').style.display='none';
-    notify(`${added} Kontakte importiert`,'ok');
+  if(!impState.headers.length) { notify('Keine Datei geladen','err'); return; }
+  // do the import
+  const mapping = impState.headers.map((_,i) => document.getElementById('map-'+i)?.value||'__ignore__');
+  let added=0, skipped=0;
+  for(const row of impState.rows) {
+    const c = { id: Date.now().toString()+'-'+Math.random().toString(36).slice(2), notizen:[], createdAt:today(), tags:[], kanaele:[] };
+    mapping.forEach((field,i) => {
+      const val = (row[i]||'').trim();
+      if(!val || field==='__ignore__') return;
+      if(field==='name') {
+        const parts = val.split(' ');
+        c.vorname = parts[0]||'';
+        c.nachname = parts.slice(1).join(' ')||'';
+      } else if(field==='kanaele') {
+        c.kanaele = val.split(/[|+,]/).map(v=>v.trim()).filter(Boolean);
+      } else if(field==='tags') {
+        c.tags = val.split(/[|,]/).map(v=>v.trim()).filter(Boolean);
+      } else {
+        c[field] = val;
+      }
+    });
+    if(!c.vorname && !c.nachname && !c.email) { skipped++; continue; }
+    if(!c.vorname)   c.vorname='';
+    if(!c.nachname)  c.nachname='';
+    if(!c.kanaele.length) c.kanaele=['LinkedIn'];
+    if(!c.status)    c.status='neu';
+    if(!c.prioritaet) c.prioritaet='mittel';
+    if(!c.owner)     c.owner=activeUser;
+    contacts.unshift(c);
+    added++;
   }
+  persist(); renderTable(); renderStats();
+  const msg = `<div class="imp-results">
+    <strong>${added} Kontakte</strong> importiert${skipped?` · ${skipped} übersprungen (kein Name/E-Mail)`:''}
+  </div>`;
+  document.getElementById('impResultMsg').innerHTML=msg;
+  document.getElementById('impResultMsg').style.display='';
+  document.getElementById('impNextBtn').style.display='none';
+  notify(`${added} Kontakte importiert ✓`,'ok');
+  // Reset file input
+  const fi = document.getElementById('impFileInput'); if(fi) fi.value='';
 }
 
 // ── SETTINGS ──────────────────────────────────────────────────
