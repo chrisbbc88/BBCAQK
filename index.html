@@ -2195,16 +2195,7 @@ function handleFileSelect(file) {
     </div>`;
 
     notify(`${file.name}: ${impState.rows.length} Zeilen erkannt`, 'ok');
-    // Use setTimeout to ensure modal open happens in next event loop tick
-    // (some browsers restrict DOM changes from within FileReader callbacks)
-    setTimeout(() => {
-      try {
-        openImportModal();
-      } catch(err) {
-        console.error('openImportModal error:', err);
-        notify('Fehler beim Öffnen des Mapping-Dialogs: ' + err.message, 'err');
-      }
-    }, 50);
+    openImportModal();
   };
 
   // Read as UTF-8
