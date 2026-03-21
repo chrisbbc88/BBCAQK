@@ -288,6 +288,115 @@
   /* MULTI-CHANNEL BADGES in table */
   .ch-badges { display: flex; gap: 4px; flex-wrap: wrap; }
 
+  /* ── QUICK ACTION POPUP ── */
+  .qa-popup {
+    position: fixed; z-index: 400; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius2);
+    box-shadow: var(--shadow2); width: 310px;
+    display: none; overflow: hidden;
+    max-height: calc(100vh - 80px);
+    display: flex; flex-direction: column;
+  }
+  .qa-popup.open { display: flex; animation: qaFadeIn 0.12s ease; }
+  @keyframes qaFadeIn { from { opacity:0; transform: translateY(-4px); } to { opacity:1; transform: translateY(0); } }
+  .qa-scroll { overflow-y: auto; flex: 1; }
+
+  .qa-header {
+    padding: 12px 14px 10px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .qa-contact-name { font-family: 'Instrument Serif', serif; font-size: 15px; color: var(--text); line-height: 1.2; }
+  .qa-contact-sub  { font-size: 11px; color: var(--text3); margin-top: 1px; }
+
+  .qa-section-lbl {
+    padding: 8px 14px 4px; font-size: 9.5px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 1px; color: var(--text3);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .qa-section-lbl::after { content:''; flex:1; height:1px; background:var(--border); }
+
+  .qa-action {
+    display: flex; align-items: center; gap: 10px; width: 100%;
+    padding: 9px 14px; border: none; background: none; cursor: pointer;
+    font-family: 'Geist', sans-serif; font-size: 13px; color: var(--text2);
+    text-align: left; transition: background 0.1s; border-left: 3px solid transparent;
+  }
+  .qa-action:hover { background: var(--surface2); color: var(--text); border-left-color: var(--accent); }
+  .qa-action:hover .qa-icon { opacity: 1; }
+  .qa-icon { width: 28px; height: 28px; border-radius: var(--radius); display: flex; align-items: center; justify-content: center; flex-shrink: 0; opacity: 0.75; transition: opacity 0.1s; }
+  .qa-label { flex: 1; }
+  .qa-label strong { display: block; font-weight: 600; font-size: 13px; color: var(--text); }
+  .qa-label span { font-size: 11px; color: var(--text3); }
+  .qa-step { font-family: 'Geist Mono', monospace; font-size: 10px; color: var(--text3); background: var(--surface2); padding: 1px 6px; border-radius: 4px; flex-shrink: 0; }
+  .qa-footer { padding: 8px 14px 10px; border-top: 1px solid var(--border); display: flex; gap: 6px; }
+  .qa-footer input {
+    flex: 1; background: var(--surface2); border: 1px solid var(--border); color: var(--text);
+    padding: 6px 10px; border-radius: var(--radius); font-family: 'Geist', sans-serif;
+    font-size: 12px; outline: none; transition: border-color 0.12s;
+  }
+  .qa-footer input:focus { border-color: var(--accent); background: var(--surface); }
+  .qa-footer input::placeholder { color: var(--text3); }
+  .log-section { padding: 14px 18px; border-bottom: 1px solid var(--border); }
+  .log-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text3); margin-bottom: 10px; }
+
+  /* Quick-Log channel buttons */
+  .log-channels { display: grid; grid-template-columns: repeat(4,1fr); gap: 6px; margin-bottom: 10px; }
+  .log-ch-btn {
+    display: flex; flex-direction: column; align-items: center; gap: 5px;
+    padding: 10px 6px; border-radius: var(--radius); border: 1.5px solid var(--border);
+    background: var(--surface2); cursor: pointer; transition: all 0.13s;
+    font-size: 11px; font-weight: 600; color: var(--text2);
+    font-family: 'Geist', sans-serif;
+  }
+  .log-ch-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow); }
+  .log-ch-btn.li:hover, .log-ch-btn.li.active { border-color: var(--blue); background: var(--blue-lt); color: var(--blue); }
+  .log-ch-btn.em:hover, .log-ch-btn.em.active { border-color: var(--amber); background: var(--amber-lt); color: var(--amber); }
+  .log-ch-btn.tel:hover, .log-ch-btn.tel.active { border-color: var(--violet); background: var(--violet-lt); color: var(--violet); }
+  .log-ch-btn.meet:hover, .log-ch-btn.meet.active { border-color: var(--teal); background: var(--teal-lt); color: var(--teal); }
+
+  /* Outcome picker */
+  .log-outcomes { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
+  .log-outcome-btn {
+    padding: 4px 11px; border-radius: 20px; font-size: 11.5px; font-weight: 500;
+    border: 1.5px solid var(--border); background: none; color: var(--text2);
+    cursor: pointer; transition: all 0.12s; font-family: 'Geist', sans-serif;
+  }
+  .log-outcome-btn:hover { border-color: var(--border2); color: var(--text); }
+  .log-outcome-btn.active { border-color: var(--accent); background: var(--accent-lt); color: var(--accent); }
+
+  /* Quick note row */
+  .log-note-row { display: flex; gap: 6px; margin-bottom: 8px; }
+  .log-note-row input {
+    flex: 1; background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text); padding: 7px 10px; border-radius: var(--radius);
+    font-family: 'Geist', sans-serif; font-size: 12.5px; outline: none; transition: border-color 0.13s;
+  }
+  .log-note-row input:focus { border-color: var(--accent); background: var(--surface); }
+  .log-note-row input::placeholder { color: var(--text3); }
+
+  /* Status quick-update inside log */
+  .log-status-row { display: flex; gap: 5px; flex-wrap: wrap; }
+  .log-status-chip {
+    padding: 3px 10px; border-radius: 4px; font-size: 11px; font-weight: 600;
+    border: 1.5px solid transparent; cursor: pointer; transition: all 0.12s;
+    font-family: 'Geist', sans-serif;
+  }
+  .log-status-chip.active { border-color: currentColor; }
+
+  /* Timeline entries - enhanced */
+  .tl-item { display: flex; gap: 10px; margin-bottom: 14px; position: relative; }
+  .tl-item:not(:last-child)::after { content:''; position:absolute; left:13px; top:26px; width:1px; height:calc(100% + 4px); background: var(--border); }
+  .tl-dot { width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid var(--border); background: var(--surface2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; z-index: 1; }
+  .tl-dot.contact { background: var(--blue-lt); border-color: var(--blue-md); }
+  .tl-dot.email   { background: var(--amber-lt); border-color: var(--amber-md); }
+  .tl-dot.phone   { background: var(--violet-lt); border-color: var(--violet-md); }
+  .tl-dot.meeting { background: var(--teal-lt); border-color: var(--teal-md); }
+  .tl-dot.status  { background: var(--blue-lt); border-color: var(--blue-md); }
+  .tl-ev { font-size: 12px; font-weight: 600; color: var(--text); line-height: 1.3; }
+  .tl-outcome { font-size: 11.5px; color: var(--text2); margin-top: 1px; }
+  .tl-note { font-size: 11.5px; color: var(--text3); margin-top: 3px; font-style: italic; line-height: 1.4; }
+  .tl-dt { font-size: 10.5px; color: var(--text3); margin-top: 3px; font-family: 'Geist Mono', monospace; }
+
   /* TAGS */
   .tag { display: inline-flex; align-items: center; gap: 4px; padding: 2px 9px; border-radius: 20px; font-size: 11px; font-weight: 500; background: var(--surface2); border: 1px solid var(--border); color: var(--text2); white-space: nowrap; }
   .tag-rm { background: none; border: none; cursor: pointer; color: var(--text3); padding: 0; display: inline-flex; align-items: center; transition: color 0.12s; line-height: 1; }
@@ -407,7 +516,152 @@
   }
   .bulk-dd-item:hover { background: var(--surface2); color: var(--text); }
   .bulk-dd-sep { height: 1px; background: var(--border); margin: 4px 0; }
+
+  /* ── DASHBOARD ── */
+  .dash-wrap { padding: 24px 28px; overflow-y: auto; flex: 1; background: var(--bg); }
+  .dash-header { margin-bottom: 22px; display: flex; align-items: flex-end; justify-content: space-between; }
+  .dash-title { font-family: 'Instrument Serif', serif; font-size: 26px; color: var(--text); letter-spacing: -0.3px; }
+  .dash-sub { font-size: 13px; color: var(--text3); margin-top: 3px; }
+  .dash-kpi-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 20px; }
+  .kpi-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius2); padding: 16px 18px; box-shadow: var(--shadow); position: relative; overflow: hidden; }
+  .kpi-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:var(--accent); }
+  .kpi-card.blue::before { background:var(--blue); } .kpi-card.amber::before { background:var(--amber); }
+  .kpi-card.violet::before { background:var(--violet); } .kpi-card.red::before { background:var(--red); }
+  .kpi-lbl { font-size:10.5px; color:var(--text3); text-transform:uppercase; letter-spacing:0.6px; font-weight:600; margin-bottom:8px; }
+  .kpi-val { font-family:'Instrument Serif',serif; font-size:34px; color:var(--text); line-height:1; }
+  .kpi-sub { font-size:11.5px; color:var(--text3); margin-top:5px; }
+  .kpi-sub.up { color:var(--teal); font-weight:600; } .kpi-sub.down { color:var(--red); font-weight:600; }
+  .goal-bar-wrap { margin-top:8px; }
+  .goal-bar-track { height:4px; background:var(--surface2); border-radius:2px; overflow:hidden; }
+  .goal-bar-fill { height:100%; border-radius:2px; transition:width 0.6s ease; }
+  .goal-pct { font-size:10.5px; color:var(--text3); margin-top:3px; }
+  .dash-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px; }
+  .dash-grid.three { grid-template-columns:1fr 1fr 1fr; }
+  .dash-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius2); overflow:hidden; box-shadow:var(--shadow); }
+  .dash-card-hd { padding:14px 18px 0; display:flex; align-items:center; justify-content:space-between; }
+  .dash-card-title { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.7px; color:var(--text3); }
+  .dash-card-body { padding:14px 18px 18px; }
+  .act-feed { display:flex; flex-direction:column; gap:0; }
+  .act-feed-item { display:flex; align-items:flex-start; gap:10px; padding:9px 0; border-bottom:1px solid var(--border); }
+  .act-feed-item:last-child { border-bottom:none; }
+  .act-feed-dot { width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .act-feed-main { font-size:12.5px; color:var(--text); font-weight:500; }
+  .act-feed-meta { font-size:11px; color:var(--text3); margin-top:1px; font-family:'Geist Mono',monospace; }
+  .goal-edit-row { display:flex; align-items:center; gap:8px; margin-bottom:10px; }
+  .goal-edit-row label { font-size:12.5px; color:var(--text2); flex:1; font-weight:500; }
+  .goal-edit-row input[type=number] { width:70px; background:var(--surface2); border:1px solid var(--border); color:var(--text); padding:5px 8px; border-radius:var(--radius); font-family:'Geist Mono',monospace; font-size:13px; outline:none; text-align:center; transition:border-color 0.13s; -moz-appearance:textfield; }
+  .goal-edit-row input[type=number]::-webkit-outer-spin-button, .goal-edit-row input[type=number]::-webkit-inner-spin-button { -webkit-appearance:none; }
+  .goal-edit-row input[type=number]:focus { border-color:var(--accent); }
+  .mini-funnel { display:flex; flex-direction:column; gap:8px; }
+  .mini-fn { display:grid; grid-template-columns:110px 1fr 36px; align-items:center; gap:8px; }
+  .mini-fn-lbl { font-size:12px; color:var(--text2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .mini-fn-track { height:6px; background:var(--surface2); border-radius:3px; overflow:hidden; }
+  .mini-fn-fill { height:100%; border-radius:3px; }
+  .mini-fn-cnt { font-size:12px; font-weight:700; color:var(--text); font-family:'Geist Mono',monospace; text-align:right; }
+  .ch-perf { display:flex; flex-direction:column; gap:10px; }
+  .ch-perf-item { display:flex; align-items:center; gap:10px; }
+  .ch-perf-icon { width:30px; height:30px; border-radius:var(--radius); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .ch-perf-info { flex:1; }
+  .ch-perf-name { font-size:12.5px; font-weight:600; color:var(--text); }
+  .ch-perf-bar-wrap { height:4px; background:var(--surface2); border-radius:2px; overflow:hidden; margin-top:4px; }
+  .ch-perf-bar { height:100%; border-radius:2px; }
+  .ch-perf-stat { text-align:right; min-width:40px; }
+  .ch-perf-num { font-family:'Geist Mono',monospace; font-size:12px; font-weight:700; color:var(--text); }
+  .ch-perf-sub { font-size:10.5px; color:var(--text3); }
+  .month-chart { display:flex; align-items:flex-end; gap:3px; height:80px; }
+  .month-bar-wrap { flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; height:100%; justify-content:flex-end; }
+  .month-bar { width:100%; border-radius:3px 3px 0 0; min-height:3px; }
+  .month-lbl { font-size:9px; color:var(--text3); font-family:'Geist Mono',monospace; }
+  .motivation-card { background:linear-gradient(135deg,var(--accent) 0%,#0f3d26 100%) !important; border-color:transparent !important; }
+  .motivation-card .dash-card-title { color:rgba(255,255,255,0.6); }
+  .motivation-num { font-family:'Instrument Serif',serif; font-size:52px; line-height:1; color:#fff; }
+  .motivation-sub { font-size:13px; color:rgba(255,255,255,0.8); margin-top:4px; }
+  .motivation-quote { font-size:12px; color:rgba(255,255,255,0.6); margin-top:10px; font-style:italic; line-height:1.5; }
+  .next-actions-list { display:flex; flex-direction:column; gap:0; }
+  .na-item { display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid var(--border); cursor:pointer; transition:background 0.1s; margin:0 -2px; padding-left:2px; border-radius:4px; }
+  .na-item:last-child { border-bottom:none; }
+  .na-item:hover { background:var(--surface2); }
+  .na-item-av { width:28px; height:28px; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; font-family:'Instrument Serif',serif; flex-shrink:0; }
+  .na-item-name { font-size:12.5px; font-weight:600; color:var(--text); }
+  .na-item-sub { font-size:11px; color:var(--text3); margin-top:1px; }
+  .na-item-date { font-family:'Geist Mono',monospace; font-size:10.5px; padding:2px 7px; border-radius:4px; white-space:nowrap; flex-shrink:0; }
+  .na-item-date.overdue { background:var(--red-lt); color:var(--red); }
+  .na-item-date.today { background:var(--amber-lt); color:var(--amber); font-weight:700; }
+  .na-item-date.soon { background:var(--accent-lt); color:var(--accent); }
+  .na-item-date.future { background:var(--surface2); color:var(--text3); }
+
   .imp-modal { width: 640px; max-width: 95vw; }
+
+  /* ── ARBEITSFENSTER ── */
+  .wb-header { margin-bottom: 22px; display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:12px; }
+  .wb-title  { font-family:'Instrument Serif',serif; font-size:26px; color:var(--text); letter-spacing:-0.3px; }
+  .wb-sub    { font-size:13px; color:var(--text3); margin-top:3px; }
+  .wb-stats  { display:flex; gap:20px; }
+  .wb-stat   { text-align:center; }
+  .wb-stat-n { font-family:'Instrument Serif',serif; font-size:28px; line-height:1; }
+  .wb-stat-l { font-size:11px; color:var(--text3); margin-top:2px; }
+  .wb-section { margin-bottom:24px; }
+  .wb-section-hd {
+    display:flex; align-items:center; gap:10px; margin-bottom:12px;
+    padding-bottom:10px; border-bottom:2px solid var(--border);
+  }
+  .wb-section-icon { width:30px; height:30px; border-radius:var(--radius); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .wb-section-title { font-size:14px; font-weight:700; color:var(--text); }
+  .wb-section-count { font-family:'Geist Mono',monospace; font-size:12px; font-weight:700; padding:2px 9px; border-radius:10px; }
+  .wb-section-desc  { font-size:12px; color:var(--text3); margin-left:auto; }
+  .wb-empty { padding:20px; text-align:center; color:var(--text3); font-size:13px; background:var(--surface); border:1px dashed var(--border); border-radius:var(--radius2); display:flex; align-items:center; justify-content:center; gap:8px; }
+
+  /* Workbench cards */
+  .wb-cards { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:10px; }
+  .wb-card {
+    background:var(--surface); border:1px solid var(--border); border-radius:var(--radius2);
+    padding:14px 16px; display:flex; flex-direction:column; gap:10px;
+    box-shadow:var(--shadow); transition:box-shadow 0.13s, border-color 0.13s; position:relative;
+  }
+  .wb-card:hover { box-shadow:var(--shadow2); border-color:var(--border2); }
+  .wb-card.overdue { border-left:3px solid var(--red); }
+  .wb-card.today   { border-left:3px solid var(--amber); }
+  .wb-card.week    { border-left:3px solid var(--accent); }
+  .wb-card.new     { border-left:3px solid var(--blue); }
+
+  .wb-card-top { display:flex; align-items:flex-start; gap:10px; }
+  .wb-card-av  { width:36px; height:36px; border-radius:var(--radius); display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:700; font-family:'Instrument Serif',serif; flex-shrink:0; border:1px solid var(--border); }
+  .wb-card-name { font-size:14px; font-weight:600; color:var(--text); line-height:1.2; }
+  .wb-card-sub  { font-size:11.5px; color:var(--text3); margin-top:2px; }
+  .wb-card-badge { position:absolute; top:12px; right:14px; }
+
+  .wb-urgency {
+    display:inline-flex; align-items:center; gap:4px;
+    padding:3px 9px; border-radius:20px; font-size:11px; font-weight:700;
+  }
+  .wb-urgency.overdue { background:var(--red-lt);   color:var(--red);   }
+  .wb-urgency.today   { background:var(--amber-lt); color:var(--amber); }
+  .wb-urgency.week    { background:var(--accent-lt);color:var(--accent);}
+  .wb-urgency.new     { background:var(--blue-lt);  color:var(--blue);  }
+
+  .wb-card-meta { display:flex; gap:6px; flex-wrap:wrap; align-items:center; }
+  .wb-last-log  { font-size:11.5px; color:var(--text3); display:flex; align-items:center; gap:4px; }
+
+  .wb-card-actions { display:flex; gap:6px; padding-top:8px; border-top:1px solid var(--border); }
+  .wb-btn {
+    display:inline-flex; align-items:center; gap:5px;
+    padding:6px 12px; border-radius:var(--radius); border:1px solid var(--border);
+    background:var(--surface2); color:var(--text2); font-family:'Geist',sans-serif;
+    font-size:12px; font-weight:500; cursor:pointer; transition:all 0.12s;
+  }
+  .wb-btn:hover { background:var(--surface3); border-color:var(--border2); color:var(--text); }
+  .wb-btn.primary { background:var(--accent); border-color:var(--accent); color:#fff; }
+  .wb-btn.primary:hover { background:#144d30; }
+
+  /* Owner filter tabs */
+  .wb-filter-tabs { display:flex; gap:6px; margin-bottom:16px; }
+  .wb-tab {
+    padding:6px 14px; border-radius:20px; font-size:12.5px; font-weight:500;
+    border:1px solid var(--border); background:none; color:var(--text2);
+    cursor:pointer; transition:all 0.12s; font-family:'Geist',sans-serif;
+  }
+  .wb-tab:hover { border-color:var(--border2); color:var(--text); }
+  .wb-tab.active { border-color:var(--accent); background:var(--accent-lt); color:var(--accent); }
   .imp-drop {
     border: 2px dashed var(--border2); border-radius: var(--radius2);
     padding: 40px 20px; text-align: center; cursor: pointer; transition: all 0.15s;
@@ -548,17 +802,31 @@
     <path d="M9 1.5H4A1.5 1.5 0 0 0 2.5 3v10A1.5 1.5 0 0 0 4 14.5h8A1.5 1.5 0 0 0 13.5 13V6L9 1.5z"/><path d="M9 1.5V6H13.5"/>
     <path d="M5 10c0 .8.6 1.5 1.5 1.5s1.5-.7 1.5-1.5-.7-1.5-1.5-1.5-1 .5-1 1"/><path d="M10.5 8.5h-1v3h1m-1-1.5h.8"/>
   </symbol>
+  <symbol id="ic-calendar" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="1.5" y="2.5" width="13" height="12" rx="1.5"/>
+    <path d="M1.5 6.5h13M5 1v3M11 1v3"/>
+    <path d="M4.5 9.5h2M9.5 9.5h2M4.5 12h2"/>
+  </symbol>
+  <symbol id="ic-tag" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M2 2h5.5l6 6a2 2 0 0 1 0 2.8l-2.7 2.7a2 2 0 0 1-2.8 0L2 7.5V2z"/><circle cx="5.5" cy="5.5" r="1"/>
+  </symbol>
 </svg>
 
 <!-- HEADER -->
 <div class="header">
   <div class="logo">BBC <em>Akquise</em></div>
   <nav class="nav">
+    <button class="nav-btn" onclick="showView('dashboard')">
+      <svg width="14" height="14"><use href="#ic-chart"/></svg> Dashboard
+    </button>
+    <button class="nav-btn" onclick="showView('workbench')">
+      <svg width="14" height="14"><use href="#ic-calendar"/></svg> Arbeitsfenster
+    </button>
     <button class="nav-btn active" onclick="showView('contacts')">
       <svg width="14" height="14"><use href="#ic-contacts"/></svg> Kontakte
     </button>
     <button class="nav-btn" onclick="showView('analytics')">
-      <svg width="14" height="14"><use href="#ic-chart"/></svg> Analysen
+      <svg width="14" height="14"><use href="#ic-pipeline"/></svg> Analysen
     </button>
     <button class="nav-btn" onclick="showView('settings')">
       <svg width="14" height="14"><use href="#ic-settings"/></svg> Einstellungen
@@ -713,6 +981,16 @@
     <div class="settings-wrap" id="settingsWrap"></div>
   </div>
 
+  <!-- DASHBOARD VIEW -->
+  <div class="main" id="viewDashboard" style="display:none; background:var(--bg)">
+    <div class="dash-wrap" id="dashWrap"></div>
+  </div>
+
+  <!-- WORKBENCH VIEW -->
+  <div class="main" id="viewWorkbench" style="display:none; background:var(--bg)">
+    <div id="workbenchWrap" style="padding:24px 28px;overflow-y:auto;flex:1"></div>
+  </div>
+
   <!-- DETAIL PANEL -->
   <div class="detail-panel" id="detailPanel">
     <div id="detailContent"></div>
@@ -858,15 +1136,18 @@
     <div style="padding:20px 22px" id="importBody">
       <!-- Step 1: Upload -->
       <div id="impStep1">
-        <label for="impFileInput" class="imp-drop" id="impDrop"
+        <div class="imp-drop" id="impDrop"
           ondragover="event.preventDefault();this.classList.add('drag')"
           ondragleave="this.classList.remove('drag')"
-          ondrop="handleDrop(event)">
+          ondrop="handleDrop(event)"
+          style="position:relative">
           <div class="imp-drop-icon"><svg width="32" height="32"><use href="#ic-file-csv"/></svg></div>
           <div class="imp-drop-txt">CSV-Datei auswählen oder hier ablegen</div>
           <div class="imp-drop-sub">Trennzeichen: Semikolon (;) oder Komma (,) · UTF-8</div>
-        </label>
-        <input type="file" id="impFileInput" accept=".csv,text/csv" style="display:none" onchange="handleFileSelect(this.files[0])">
+          <input type="file" id="impFileInput" accept=".csv,text/csv"
+            onchange="handleFileSelect(this.files[0])"
+            style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;font-size:0">
+        </div>
         <div id="impFileInfo" style="display:none;margin-top:12px"></div>
       </div>
       <!-- Step 2: Mapping -->
@@ -887,6 +1168,21 @@
         <svg width="13" height="13"><use href="#ic-import"/></svg> Weiter
       </button>
     </div>
+  </div>
+</div>
+
+<!-- QUICK ACTION POPUP -->
+<div class="qa-popup" id="qaPopup" onclick="event.stopPropagation()">
+  <div class="qa-header">
+    <div>
+      <div class="qa-contact-name" id="qaName"></div>
+      <div class="qa-contact-sub" id="qaSub"></div>
+    </div>
+    <button class="ico-btn" onclick="closeQA()" style="flex-shrink:0"><svg width="13" height="13"><use href="#ic-x"/></svg></button>
+  </div>
+  <div id="qaActions" class="qa-scroll"></div>
+  <div class="qa-footer">
+    <input id="qa-note" placeholder="Optionale Notiz zum Eintrag …" onkeydown="if(event.key==='Enter'){event.preventDefault();}">
   </div>
 </div>
 
@@ -1001,14 +1297,18 @@ function toggleUser() {
 
 // ── VIEW ──────────────────────────────────────────────────────
 function showView(v) {
-  document.getElementById('viewContacts').style.display  = v==='contacts' ?'flex':'none';
-  document.getElementById('viewAnalytics').style.display = v==='analytics'?'flex':'none';
-  document.getElementById('viewSettings').style.display  = v==='settings' ?'flex':'none';
+  document.getElementById('viewContacts').style.display    = v==='contacts'  ?'flex':'none';
+  document.getElementById('viewAnalytics').style.display   = v==='analytics' ?'flex':'none';
+  document.getElementById('viewSettings').style.display    = v==='settings'  ?'flex':'none';
+  document.getElementById('viewDashboard').style.display   = v==='dashboard' ?'flex':'none';
+  document.getElementById('viewWorkbench').style.display   = v==='workbench' ?'flex':'none';
   document.querySelectorAll('.nav-btn').forEach((b,i)=>b.classList.toggle('active',
-    (i===0&&v==='contacts')||(i===1&&v==='analytics')||(i===2&&v==='settings')));
-  if(v==='analytics') renderAnalytics();
-  if(v==='contacts') { renderTable(); renderStats(); }
-  if(v==='settings') renderSettings();
+    (i===0&&v==='dashboard')||(i===1&&v==='workbench')||(i===2&&v==='contacts')||(i===3&&v==='analytics')||(i===4&&v==='settings')));
+  if(v==='analytics')  renderAnalytics();
+  if(v==='contacts')   { renderTable(); renderStats(); }
+  if(v==='settings')   renderSettings();
+  if(v==='dashboard')  renderDashboard();
+  if(v==='workbench')  renderWorkbench();
 }
 
 // ── FILTER ────────────────────────────────────────────────────
@@ -1168,6 +1468,9 @@ function renderTable() {
       <td><div style="display:flex;flex-wrap:wrap;gap:3px">${(c.tags||[]).map(t=>`<span class="tag">${t}</span>`).join('')}</div></td>
       <td><div class="act-cell" onclick="event.stopPropagation()">
         <button class="ico-btn" onclick="openEdit('${c.id}')" title="Bearbeiten"><svg width="13" height="13"><use href="#ic-edit"/></svg></button>
+        <button class="ico-btn" onclick="openQuickAction('${c.id}',event)" title="Nächste Aktion" style="gap:3px;padding:0 8px;width:auto;font-size:11px;font-weight:600;color:var(--accent);border-color:var(--accent-md);background:var(--accent-lt)">
+          <svg width="12" height="12"><use href="#ic-send"/></svg> Aktion
+        </button>
         <button class="ico-btn del" onclick="delC('${c.id}')" title="Löschen"><svg width="13" height="13"><use href="#ic-trash"/></svg></button>
       </div></td>
     </tr>`;
@@ -1407,16 +1710,67 @@ function delC(id){
 }
 
 // ── DETAIL ────────────────────────────────────────────────────
-function openDetail(id){
-  const c=contacts.find(x=>x.id===id);if(!c)return;detailId=id;
-  const [bg,fg]=avc(c);
-  const fn=fullName(c);
-  const tlHtml=(c.notizen||[]).length?(c.notizen||[]).map(n=>`
-    <div class="tl-item">
-      <div class="tl-dot"><svg width="12" height="12" color="${n.type==='status'?'var(--blue)':'var(--text3)'}"><use href="#${n.type==='status'?'ic-swap':'ic-note'}"/></svg></div>
-      <div style="padding-top:4px"><div class="tl-ev">${n.text}</div><div class="tl-dt">${fmt(n.date)} · ${n.user}</div></div>
-    </div>`).join('') : '<div style="font-size:12px;color:var(--text3);padding:2px 0">Noch keine Aktivitäten</div>';
-  document.getElementById('detailContent').innerHTML=`
+// Protocol state (per-session, resets on panel open/close)
+let _logState = { channel: null, outcome: null };
+
+const LOG_CHANNELS = [
+  { key:'linkedin', label:'LinkedIn', icon:'ic-linkedin', cls:'li', dotCls:'contact' },
+  { key:'email',    label:'E-Mail',   icon:'ic-mail',     cls:'em', dotCls:'email'   },
+  { key:'telefon',  label:'Telefon',  icon:'ic-phone',    cls:'tel',dotCls:'phone'   },
+  { key:'meeting',  label:'Meeting',  icon:'ic-calendar', cls:'meet',dotCls:'meeting'},
+];
+const LOG_OUTCOMES = {
+  linkedin: ['Nachricht gesendet','Verbindung gesendet','Antwort erhalten','Kein Kontakt'],
+  email:    ['Gesendet','Geöffnet','Antwort erhalten','Bounce / Keine Zustellung'],
+  telefon:  ['Erreicht','Voicemail','Nicht abgenommen','Falsche Nummer'],
+  meeting:  ['Termin vereinbart','Termin durchgeführt','Abgesagt','Verschoben'],
+};
+const LOG_ICONS = {
+  linkedin:'ic-linkedin', email:'ic-mail', telefon:'ic-phone', meeting:'ic-calendar',
+  status:'ic-swap', note:'ic-note',
+};
+const LOG_DOT_CLS = {
+  linkedin:'contact', email:'email', telefon:'phone', meeting:'meeting', status:'status', note:'',
+};
+
+function openDetail(id) {
+  const c = contacts.find(x=>x.id===id); if(!c) return; detailId=id;
+  _logState = { channel: null, outcome: null };
+  const [bg,fg] = avc(c);
+  document.getElementById('detailContent').innerHTML = buildDetailHTML(c);
+  document.getElementById('detailPanel').classList.add('open');
+}
+
+function buildDetailHTML(c) {
+  const id = c.id;
+  const [bg,fg] = avc(c);
+  const notizen = c.notizen||[];
+
+  // Build timeline
+  const tlHtml = notizen.length ? notizen.map(n=>{
+    const dotCls = LOG_DOT_CLS[n.type]||'';
+    const ico    = LOG_ICONS[n.type]||'ic-note';
+    const chCol  = n.type==='linkedin'?'var(--blue)':n.type==='email'?'var(--amber)':n.type==='telefon'?'var(--violet)':n.type==='meeting'?'var(--teal)':n.type==='status'?'var(--blue)':'var(--text3)';
+    const label  = LOG_CHANNELS.find(ch=>ch.key===n.type)?.label || (n.type==='status'?'Statuswechsel':'Notiz');
+    return `<div class="tl-item">
+      <div class="tl-dot ${dotCls}"><svg width="12" height="12" color="${chCol}"><use href="#${ico}"/></svg></div>
+      <div style="padding-top:3px;min-width:0">
+        <div class="tl-ev">${n.type==='status'||n.type==='note' ? n.text : label}</div>
+        ${n.outcome?`<div class="tl-outcome">→ ${n.outcome}</div>`:''}
+        ${n.type!=='status'&&n.type!=='note'&&n.text?`<div class="tl-note">${n.text}</div>`:''}
+        <div class="tl-dt">${fmt(n.date)}${n.time?' · '+n.time:''} · ${n.user}</div>
+      </div>
+    </div>`;
+  }).join('') : '<div style="font-size:12px;color:var(--text3);padding:4px 0">Noch keine Aktivitäten</div>';
+
+  // Channel quick buttons
+  const chBtns = LOG_CHANNELS.map(ch=>`
+    <button class="log-ch-btn ${ch.cls}" id="lch-${ch.key}" onclick="selectLogChannel('${ch.key}','${id}')">
+      <svg width="18" height="18"><use href="#${ch.icon}"/></svg>
+      ${ch.label}
+    </button>`).join('');
+
+  return `
     <div class="dp-hd">
       <div class="dp-av" style="background:${bg};color:${fg};border-color:${bg}">${ini(c)}</div>
       <div style="flex:1;min-width:0">
@@ -1425,10 +1779,13 @@ function openDetail(id){
       </div>
       <button class="ico-btn" onclick="closeDetail()" style="flex-shrink:0"><svg width="13" height="13"><use href="#ic-x"/></svg></button>
     </div>
+
     <div class="tab-bar">
       <div class="tab-item active" onclick="dtTab(this,'di')">Info</div>
-      <div class="tab-item" onclick="dtTab(this,'da')">Aktivität</div>
+      <div class="tab-item" onclick="dtTab(this,'da')">Protokoll</div>
     </div>
+
+    <!-- INFO TAB -->
     <div id="di">
       <div class="dp-section">
         <div class="dp-stitle">Status</div>
@@ -1451,22 +1808,43 @@ function openDetail(id){
       </div>
       <div style="padding:12px 18px;display:flex;gap:8px">
         <button class="btn btn-primary" style="flex:1;justify-content:center" onclick="openEdit('${id}')"><svg width="13" height="13"><use href="#ic-edit"/></svg> Bearbeiten</button>
-        <button class="btn btn-ghost" onclick="switchToActivityTab()" title="Aktivität"><svg width="13" height="13"><use href="#ic-note"/></svg></button>
+        <button class="btn btn-ghost" onclick="switchToActivityTab()" title="Protokoll"><svg width="13" height="13"><use href="#ic-note"/></svg></button>
         <button class="btn btn-danger" onclick="delC('${id}')" title="Löschen"><svg width="13" height="13"><use href="#ic-trash"/></svg></button>
       </div>
     </div>
+
+    <!-- PROTOKOLL TAB -->
     <div id="da" style="display:none">
-      <div class="timeline">${tlHtml}</div>
-      <div class="add-note">
-        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text3);margin-bottom:7px">Notiz hinzufügen</div>
-        <div class="note-row">
-          <textarea id="ni-${id}" placeholder="Notiz eingeben …" rows="2"></textarea>
-          <button class="btn btn-primary" style="align-self:flex-end;padding:7px 12px" onclick="addNote('${id}')"><svg width="13" height="13"><use href="#ic-plus"/></svg></button>
+
+      <!-- Quick Log -->
+      <div class="log-section">
+        <div class="log-title">Kontakt protokollieren</div>
+        <div class="log-channels">${chBtns}</div>
+        <div id="log-outcome-area" style="display:none">
+          <div style="font-size:10.5px;font-weight:600;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.6px">Ergebnis</div>
+          <div class="log-outcomes" id="log-outcomes"></div>
+          <div class="log-note-row">
+            <input id="log-note-inp" placeholder="Optionale Notiz …" onkeydown="if(event.key==='Enter')saveLogEntry('${id}')">
+          </div>
+          <div style="margin-bottom:10px">
+            <div style="font-size:10.5px;font-weight:600;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.6px">Status aktualisieren</div>
+            <div class="log-status-row" id="log-status-row">
+              ${Object.entries(ST_LBL).map(([k,v])=>`<span class="log-status-chip st-badge ${ST_CLS[k]}" data-status="${k}" onclick="selectLogStatus('${k}')" style="cursor:pointer">${v}</span>`).join('')}
+            </div>
+          </div>
+          <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="saveLogEntry('${id}')">
+            <svg width="13" height="13"><use href="#ic-check"/></svg> Eintragen
+          </button>
         </div>
+      </div>
+
+      <!-- Timeline -->
+      <div class="timeline" style="padding:14px 18px">
+        <div class="log-title">Aktivitätsverlauf</div>
+        ${tlHtml}
       </div>
     </div>
   `;
-  document.getElementById('detailPanel').classList.add('open');
 }
 
 function dtTab(el, tid) {
@@ -1485,6 +1863,7 @@ function switchToActivityTab() {
 function closeDetail(){detailId=null;document.getElementById('detailPanel').classList.remove('open');}
 
 function addNote(id){
+  // Legacy - keep for any old references
   const inp=document.getElementById('ni-'+id);
   if(!inp||!inp.value.trim()) return;
   const c=contacts.find(x=>x.id===id);
@@ -1495,6 +1874,99 @@ function addNote(id){
   openDetail(id);
   switchToActivityTab();
   notify('Notiz gespeichert','ok');
+}
+
+// ── PROTOKOLL FUNCTIONS ───────────────────────────────────────
+function selectLogChannel(chKey, contactId) {
+  _logState.channel = chKey;
+  _logState.outcome = null;
+  _logState.newStatus = null;
+
+  // Update button active states
+  LOG_CHANNELS.forEach(ch=>{
+    const btn = document.getElementById('lch-'+ch.key);
+    if(btn) btn.classList.toggle('active', ch.key===chKey);
+  });
+
+  // Show outcome area
+  const area = document.getElementById('log-outcome-area');
+  if(area) area.style.display='';
+
+  // Render outcome buttons for chosen channel
+  const outcomes = LOG_OUTCOMES[chKey] || [];
+  const outEl = document.getElementById('log-outcomes');
+  if(outEl) {
+    outEl.innerHTML = outcomes.map(o=>
+      `<button class="log-outcome-btn" onclick="selectLogOutcome(this,'${o.replace(/'/g,"\\'")}')">${o}</button>`
+    ).join('');
+  }
+
+  // Clear note input
+  const ni = document.getElementById('log-note-inp');
+  if(ni) { ni.value=''; ni.focus(); }
+
+  // Reset status chips
+  document.querySelectorAll('.log-status-chip').forEach(s=>s.classList.remove('active'));
+}
+
+function selectLogOutcome(el, outcome) {
+  _logState.outcome = outcome;
+  document.querySelectorAll('.log-outcome-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function selectLogStatus(key) {
+  _logState.newStatus = (_logState.newStatus===key) ? null : key;
+  document.querySelectorAll('.log-status-chip').forEach(s=>{
+    s.classList.toggle('active', s.getAttribute('data-status')===_logState.newStatus);
+  });
+}
+
+function saveLogEntry(id) {
+  if(!_logState.channel) { notify('Bitte erst einen Kanal wählen','err'); return; }
+  const c = contacts.find(x=>x.id===id);
+  if(!c) return;
+
+  const note = (document.getElementById('log-note-inp')?.value||'').trim();
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});
+
+  const entry = {
+    type:    _logState.channel,
+    outcome: _logState.outcome || null,
+    text:    note,
+    date:    today(),
+    time:    timeStr,
+    user:    activeUser,
+  };
+
+  c.notizen = c.notizen||[];
+  c.notizen.unshift(entry);
+
+  // Auto-update lastContact
+  c.lastContact = today();
+
+  // Apply status change if selected
+  if(_logState.newStatus && _logState.newStatus !== c.status) {
+    const prevStatus = c.status;
+    c.status = _logState.newStatus;
+    c.notizen.unshift({
+      type:   'status',
+      text:   `Status: ${ST_LBL[prevStatus]||prevStatus} → ${ST_LBL[_logState.newStatus]||_logState.newStatus}`,
+      date:   today(),
+      time:   timeStr,
+      user:   activeUser,
+    });
+  }
+
+  persist();
+  renderTable(); renderStats();
+
+  // Reset log state and re-render detail
+  _logState = { channel:null, outcome:null, newStatus:null };
+  openDetail(id);
+  switchToActivityTab();
+  notify('Eingetragen ✓','ok');
 }
 
 // ── ANALYTICS ─────────────────────────────────────────────────
@@ -1618,11 +2090,15 @@ function openImport() {
   document.getElementById('impStep1').style.display='';
   document.getElementById('impStep2').style.display='none';
   document.getElementById('impFileInfo').style.display='none';
+  document.getElementById('impFileInfo').innerHTML='';
   document.getElementById('impTitle').textContent='CSV importieren — Datei wählen';
   document.getElementById('impNextBtn').innerHTML='<svg width="13" height="13"><use href="#ic-import"/></svg> Weiter';
   document.getElementById('impNextBtn').style.display='';
   document.getElementById('impResultMsg').style.display='none';
-  document.getElementById('impFileInput').value='';
+  const fi = document.getElementById('impFileInput');
+  if(fi) fi.value='';
+  const drop = document.getElementById('impDrop');
+  if(drop) drop.classList.remove('drag');
   document.getElementById('importOverlay').classList.add('open');
 }
 function closeImport(e) {
@@ -1795,6 +2271,13 @@ const DEFAULT_SETTINGS = {
   ],
   branches: ['Maschinenbau','E-Commerce','Logistik','IT-Dienstleistung','Handel','Unternehmensberatung','Software','Immobilien','SaaS','Produktion','Gesundheit','Finanzen'],
   defaultTags: ['Messe','Warmkontakt','Kaltakquise','Empfehlung','Google Ads','SEO','CRM'],
+  goals: {
+    kontakteMonat:    20,
+    erstkontakteMonat: 10,
+    followUpsMonat:   15,
+    angeboteMonat:     5,
+    gewonnenMonat:     2,
+  },
 };
 
 let settings = JSON.parse(localStorage.getItem('akq_settings') || 'null') || JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
@@ -1899,10 +2382,13 @@ function renderSettings() {
               <div class="s-backup-icon"><svg width="28" height="28" color="var(--blue)"><use href="#ic-restore"/></svg></div>
               <div class="s-backup-label">Backup wiederherstellen</div>
               <div class="s-backup-desc">JSON-Backup-Datei laden und Daten wiederherstellen</div>
-              <label for="restoreInput" class="btn btn-ghost" style="width:100%;justify-content:center;cursor:pointer;display:inline-flex;align-items:center;gap:6px;margin:0">
-                <svg width="13" height="13"><use href="#ic-upload"/></svg> Datei wählen
-              </label>
-              <input type="file" id="restoreInput" accept=".json" style="display:none" onchange="restoreBackup(this.files[0])">
+              <div style="position:relative;display:inline-flex;width:100%">
+                <div class="btn btn-ghost" style="width:100%;justify-content:center;pointer-events:none">
+                  <svg width="13" height="13"><use href="#ic-upload"/></svg> Datei wählen
+                </div>
+                <input type="file" id="restoreInput" accept=".json" onchange="restoreBackup(this.files[0])"
+                  style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;font-size:0">
+              </div>
             </div>
 
             <div class="s-backup-card">
@@ -2106,7 +2592,639 @@ function confirmResolve(ok) {
   _confirmCallback = null;
 }
 
-// ── NOTIFY ────────────────────────────────────────────────────
+// ── QUICK ACTION (Nächste Aktion Popup) ──────────────────────
+let _qaContactId = null;
+
+// Actions in deliberate process order: connect → reach out → follow up → close
+const QA_ACTIONS = [
+  {
+    section: '1. Erstkontakt herstellen',
+    actions: [
+      { key:'li-connect',  label:'LinkedIn Kontaktanfrage',  sub:'Verbindungsanfrage senden',           icon:'ic-linkedin', iconBg:'var(--blue-lt)',   iconColor:'var(--blue)',   type:'linkedin', outcome:'Verbindung gesendet',    nextStatus:'kontaktiert' },
+      { key:'li-msg',      label:'LinkedIn Nachricht',        sub:'Direkte Nachricht senden',             icon:'ic-send',     iconBg:'var(--blue-lt)',   iconColor:'var(--blue)',   type:'linkedin', outcome:'Nachricht gesendet',     nextStatus:'kontaktiert' },
+      { key:'email-first', label:'E-Mail versenden',          sub:'Erstanschreiben per E-Mail',           icon:'ic-mail',     iconBg:'var(--amber-lt)',  iconColor:'var(--amber)',  type:'email',    outcome:'Gesendet',              nextStatus:'kontaktiert' },
+      { key:'phone-first', label:'Anrufen',                   sub:'Telefonischen Kontakt herstellen',     icon:'ic-phone',    iconBg:'var(--violet-lt)', iconColor:'var(--violet)', type:'telefon',  outcome:'Erreicht',              nextStatus:'kontaktiert' },
+    ]
+  },
+  {
+    section: '2. Nachfassen',
+    actions: [
+      { key:'li-follow',   label:'LinkedIn Nachfassen',       sub:'Follow-up Nachricht senden',           icon:'ic-send',     iconBg:'var(--blue-lt)',   iconColor:'var(--blue)',   type:'linkedin', outcome:'Nachricht gesendet',     nextStatus:null },
+      { key:'email-fu',    label:'Follow-up E-Mail',          sub:'Zweite E-Mail versenden',              icon:'ic-mail',     iconBg:'var(--amber-lt)',  iconColor:'var(--amber)',  type:'email',    outcome:'Gesendet',              nextStatus:null },
+      { key:'phone-fu',    label:'Rückruf / Nachfassen',      sub:'Telefonisch nachfassen',               icon:'ic-phone',    iconBg:'var(--violet-lt)', iconColor:'var(--violet)', type:'telefon',  outcome:'Erreicht',              nextStatus:'antwort' },
+      { key:'voicemail',   label:'Voicemail hinterlassen',    sub:'Nachricht auf Anrufbeantworter',       icon:'ic-phone',    iconBg:'var(--violet-lt)', iconColor:'var(--violet)', type:'telefon',  outcome:'Voicemail',             nextStatus:null },
+    ]
+  },
+  {
+    section: '3. Qualifizierung & Angebot',
+    actions: [
+      { key:'meeting',     label:'Meeting / Termin',          sub:'Gespräch geführt oder vereinbart',     icon:'ic-calendar', iconBg:'var(--teal-lt)',   iconColor:'var(--teal)',   type:'meeting',  outcome:'Termin durchgeführt',   nextStatus:'qualifiziert' },
+      { key:'offer',       label:'Angebot versendet',         sub:'Angebot oder Präsentation gesendet',   icon:'ic-doc',      iconBg:'var(--accent-lt)', iconColor:'var(--accent)', type:'email',    outcome:'Gesendet',              nextStatus:'angebot' },
+      { key:'won',         label:'Auftrag gewonnen',          sub:'Kunde hat zugesagt',                   icon:'ic-check-circle', iconBg:'var(--teal-lt)', iconColor:'var(--teal)', type:'note',    outcome:'Gewonnen',             nextStatus:'gewonnen' },
+      { key:'lost',        label:'Nicht gewonnen',            sub:'Kontakt hat abgelehnt',                icon:'ic-x-circle', iconBg:'var(--red-lt)',    iconColor:'var(--red)',    type:'note',     outcome:'Verloren',              nextStatus:'verloren' },
+    ]
+  },
+];
+
+function openQuickAction(id, e) {
+  e.stopPropagation();
+  const c = contacts.find(x=>x.id===id);
+  if(!c) return;
+  _qaContactId = id;
+
+  // Position popup near the button
+  const btn = e.currentTarget;
+  const rect = btn.getBoundingClientRect();
+  const popup = document.getElementById('qaPopup');
+
+  // Set contact info
+  document.getElementById('qaName').textContent = fullName(c);
+  document.getElementById('qaSub').textContent  = (c.position||'') + (c.firma?' @ '+c.firma:'');
+  document.getElementById('qa-note').value = '';
+
+  // Build actions
+  document.getElementById('qaActions').innerHTML = QA_ACTIONS.map(section => `
+    <div class="qa-section-lbl">${section.section}</div>
+    ${section.actions.map(a=>`
+      <button class="qa-action" onclick="doQuickAction('${id}','${a.key}')">
+        <div class="qa-icon" style="background:${a.iconBg};color:${a.iconColor}">
+          <svg width="14" height="14"><use href="#${a.icon}"/></svg>
+        </div>
+        <div class="qa-label">
+          <strong>${a.label}</strong>
+          <span>${a.sub}</span>
+        </div>
+        ${a.nextStatus?`<span class="qa-step"><span class="st-badge ${ST_CLS[a.nextStatus]||''}" style="font-size:10px;padding:1px 7px">${ST_LBL[a.nextStatus]||a.nextStatus}</span></span>`:''}
+      </button>`).join('')}
+  `).join('');
+
+  // Position: smart placement to always stay in viewport
+  popup.style.display = 'flex';
+  popup.classList.add('open');
+  const vw = window.innerWidth, vh = window.innerHeight;
+  const pw = popup.offsetWidth;
+  // Calculate available space above and below
+  const spaceBelow = vh - rect.bottom - 10;
+  const spaceAbove = rect.top - 10;
+  const maxH = Math.min(Math.max(spaceBelow, spaceAbove) - 6, vh - 80);
+  popup.style.maxHeight = maxH + 'px';
+  // Prefer below, fall back to above
+  let top = spaceBelow >= 200 || spaceBelow >= spaceAbove
+    ? rect.bottom + 6
+    : rect.top - popup.offsetHeight - 6;
+  // Clamp to viewport
+  top = Math.max(10, Math.min(top, vh - popup.offsetHeight - 10));
+  let left = rect.left;
+  if(left + pw > vw - 10) left = vw - pw - 10;
+  if(left < 6) left = 6;
+  popup.style.top  = top  + 'px';
+  popup.style.left = left + 'px';
+}
+
+function closeQA() {
+  const popup = document.getElementById('qaPopup');
+  if(popup) { popup.classList.remove('open'); popup.style.display='none'; }
+  _qaContactId = null;
+}
+
+function doQuickAction(id, actionKey) {
+  const c = contacts.find(x=>x.id===id);
+  if(!c) return;
+
+  // Find the action definition
+  let action = null;
+  for(const section of QA_ACTIONS) {
+    action = section.actions.find(a=>a.key===actionKey);
+    if(action) break;
+  }
+  if(!action) return;
+
+  const note  = (document.getElementById('qa-note')?.value||'').trim();
+  const now   = new Date();
+  const tStr  = now.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});
+
+  // Log the action
+  c.notizen = c.notizen||[];
+  c.notizen.unshift({
+    type:    action.type,
+    outcome: action.outcome,
+    text:    note,
+    date:    today(),
+    time:    tStr,
+    user:    activeUser,
+  });
+
+  // Update lastContact
+  c.lastContact = today();
+
+  // Apply status change if defined and different
+  if(action.nextStatus && action.nextStatus !== c.status) {
+    const prev = c.status;
+    c.status = action.nextStatus;
+    c.notizen.unshift({
+      type:  'status',
+      text:  `Status: ${ST_LBL[prev]||prev} → ${ST_LBL[action.nextStatus]||action.nextStatus}`,
+      date:  today(),
+      time:  tStr,
+      user:  activeUser,
+    });
+  }
+
+  persist();
+  closeQA();
+  renderTable(); renderStats();
+
+  // If detail panel is open for this contact, refresh it
+  if(detailId===id) openDetail(id);
+
+  notify(`${action.label} eingetragen ✓`, 'ok');
+}
+
+// Close popup when clicking outside
+document.addEventListener('click', function(e) {
+  const popup = document.getElementById('qaPopup');
+  if(popup && popup.classList.contains('open') && !popup.contains(e.target)) {
+    closeQA();
+  }
+});
+
+// ── DASHBOARD ─────────────────────────────────────────────────
+function renderDashboard() {
+  const all = contacts;
+  const goals = settings.goals || DEFAULT_SETTINGS.goals;
+  const now = new Date();
+  const thisMonth = now.getMonth(), thisYear = now.getFullYear();
+  const lastMonth = thisMonth === 0 ? 11 : thisMonth - 1;
+  const lastYear  = thisMonth === 0 ? thisYear - 1 : thisYear;
+  const monthNames = ['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
+  const curMonthName = monthNames[thisMonth];
+
+  function inMonth(dateStr, m, y) {
+    if(!dateStr) return false;
+    const d = new Date(dateStr);
+    return d.getMonth()===m && d.getFullYear()===y;
+  }
+  function logEntriesInMonth(m, y, types) {
+    let count = 0;
+    all.forEach(c=>(c.notizen||[]).forEach(n=>{
+      if(inMonth(n.date,m,y) && (types?types.includes(n.type):true)) count++;
+    }));
+    return count;
+  }
+
+  // ── KPI calculations ──
+  const kontakteThisMonth  = all.filter(c=>inMonth(c.lastContact, thisMonth, thisYear)).length;
+  const kontakteLastMonth  = all.filter(c=>inMonth(c.lastContact, lastMonth, lastYear)).length;
+  const kontakteTrend      = kontakteLastMonth ? Math.round((kontakteThisMonth-kontakteLastMonth)/kontakteLastMonth*100) : null;
+
+  // Erste Kontaktaufnahmen = contacts created this month OR first log entry this month
+  const erstkontakteThis   = all.filter(c=>inMonth(c.createdAt, thisMonth, thisYear)).length;
+  const erstkontakteLast   = all.filter(c=>inMonth(c.createdAt, lastMonth, lastYear)).length;
+
+  const followUpsThis      = logEntriesInMonth(thisMonth, thisYear, ['linkedin','email','telefon','meeting']);
+  const followUpsLast      = logEntriesInMonth(lastMonth, lastYear, ['linkedin','email','telefon','meeting']);
+  const followUpsTrend     = followUpsLast ? Math.round((followUpsThis-followUpsLast)/followUpsLast*100) : null;
+
+  const angeboteThis       = all.filter(c=>c.status==='angebot').length;
+  const gewonnenThis       = all.filter(c=>c.status==='gewonnen').length;
+  const cr                 = all.length ? Math.round(gewonnenThis/all.length*100) : 0;
+
+  // Avg days to close (gewonnen only)
+  const closedContacts = all.filter(c=>c.status==='gewonnen'&&c.createdAt&&c.lastContact);
+  const avgDays = closedContacts.length
+    ? Math.round(closedContacts.reduce((s,c)=>(s+(new Date(c.lastContact)-new Date(c.createdAt))/86400000),0)/closedContacts.length)
+    : null;
+
+  // ── Goal progress ──
+  function goalBar(val, goal, color) {
+    const pct = goal ? Math.min(Math.round(val/goal*100), 100) : 0;
+    const realPct = goal ? Math.round(val/goal*100) : 0;
+    const over = goal ? val >= goal : false;
+    return `<div class="goal-bar-wrap">
+      <div class="goal-bar-track"><div class="goal-bar-fill" style="width:${pct}%;background:${over?'var(--teal)':color}"></div></div>
+      <div class="goal-pct" style="display:flex;justify-content:space-between;align-items:center">
+        <span>${val} / ${goal}${over?' ✓':''}</span>
+        <span style="font-weight:700;color:${over?'var(--teal)':realPct>=70?'var(--amber)':'var(--text3)'}">${realPct}%</span>
+      </div>
+    </div>`;
+  }
+  function trendBadge(trend) {
+    if(trend===null) return '<span class="kpi-sub">vs. Vormonat</span>';
+    const up = trend >= 0;
+    return `<span class="kpi-sub ${up?'up':'down'}">${up?'▲':'▼'} ${Math.abs(trend)}% vs. Vormonat</span>`;
+  }
+
+  // ── Monthly chart (last 6 months) ──
+  const months6 = Array.from({length:6},(_,i)=>{
+    const d = new Date(thisYear, thisMonth - 5 + i, 1);
+    return { m: d.getMonth(), y: d.getFullYear(), lbl: monthNames[d.getMonth()] };
+  });
+  const chartData = months6.map(({m,y,lbl})=>({
+    lbl, kontakte: all.filter(c=>inMonth(c.lastContact,m,y)).length,
+    neu: all.filter(c=>inMonth(c.createdAt,m,y)).length,
+  }));
+  const chartMax = Math.max(...chartData.map(d=>d.kontakte),1);
+
+  // ── Recent activity feed (last 8 log entries across all contacts) ──
+  const recentLogs = [];
+  all.forEach(c=>(c.notizen||[]).forEach(n=>{
+    recentLogs.push({...n, contactId:c.id, contactName:fullName(c), contactColors:avc(c), contactIni:ini(c)});
+  }));
+  recentLogs.sort((a,b)=>{
+    const da=new Date(a.date+(a.time?'T'+a.time:'')), db=new Date(b.date+(b.time?'T'+b.time:''));
+    return db-da;
+  });
+  const feedItems = recentLogs.slice(0,8).map(n=>{
+    const [bg,fg]=n.contactColors;
+    const typeLabel = LOG_CHANNELS.find(c=>c.key===n.type)?.label || (n.type==='status'?'Statuswechsel':'Notiz');
+    const typeColor = n.type==='linkedin'?'var(--blue-lt)':n.type==='email'?'var(--amber-lt)':n.type==='telefon'?'var(--violet-lt)':n.type==='meeting'?'var(--teal-lt)':'var(--surface2)';
+    const typeIconColor = n.type==='linkedin'?'var(--blue)':n.type==='email'?'var(--amber)':n.type==='telefon'?'var(--violet)':n.type==='meeting'?'var(--teal)':'var(--text3)';
+    const ico = LOG_ICONS[n.type]||'ic-note';
+    const desc = n.outcome ? `${typeLabel} · ${n.outcome}` : typeLabel;
+    return `<div class="act-feed-item" onclick="openDetail('${n.contactId}')" style="cursor:pointer">
+      <div class="act-feed-dot" style="background:${typeColor};color:${typeIconColor}">
+        <svg width="12" height="12"><use href="#${ico}"/></svg>
+      </div>
+      <div class="act-feed-text">
+        <div class="act-feed-main">${n.contactName}${n.text?` — <span style="font-weight:400;color:var(--text3)">${n.text}</span>`:''}</div>
+        <div class="act-feed-meta">${desc} · ${fmt(n.date)}${n.time?' '+n.time:''} · ${n.user}</div>
+      </div>
+    </div>`;
+  }).join('') || '<div style="font-size:12.5px;color:var(--text3);padding:8px 0">Noch keine Aktivitäten protokolliert</div>';
+
+  // ── Next actions due ──
+  const dueContacts = all
+    .filter(c=>c.nextAction && !['gewonnen','verloren'].includes(c.status))
+    .sort((a,b)=>new Date(a.nextAction)-new Date(b.nextAction))
+    .slice(0,6);
+  const todayStr = today();
+  const dueItems = dueContacts.map(c=>{
+    const [bg,fg]=avc(c);
+    const d=c.nextAction, overdue=d<todayStr, isToday=d===todayStr, soon=d<=new Date(Date.now()+3*86400000).toISOString().slice(0,10);
+    const cls=overdue?'overdue':isToday?'today':soon?'soon':'future';
+    const lbl=overdue?'Überfällig':isToday?'Heute':fmt(d);
+    return `<div class="na-item" onclick="openDetail('${c.id}')">
+      <div class="na-item-av" style="background:${bg};color:${fg}">${ini(c)}</div>
+      <div style="flex:1;min-width:0">
+        <div class="na-item-name">${fullName(c)}</div>
+        <div class="na-item-sub">${c.firma||'—'} · <span class="st-badge ${ST_CLS[c.status]||''}" style="font-size:10px;padding:1px 7px">${ST_LBL[c.status]||c.status}</span></div>
+      </div>
+      <span class="na-item-date ${cls}">${lbl}</span>
+    </div>`;
+  }).join('') || '<div style="font-size:12.5px;color:var(--text3);padding:8px 0">Keine ausstehenden Aktionen</div>';
+
+  // ── Channel performance ──
+  const chStats = ['LinkedIn','Email','Telefon'].map(ch=>{
+    const cnt = all.filter(c=>getKanaele(c).includes(ch)).length;
+    const won = all.filter(c=>getKanaele(c).includes(ch)&&c.status==='gewonnen').length;
+    const cr  = cnt ? Math.round(won/cnt*100) : 0;
+    const logs = logEntriesInMonth(thisMonth, thisYear,
+      ch==='LinkedIn'?['linkedin']:ch==='Email'?['email']:['telefon']);
+    return {ch, cnt, won, cr, logs};
+  });
+  const maxChCnt = Math.max(...chStats.map(c=>c.cnt),1);
+  const chColors = {LinkedIn:'var(--blue)',Email:'var(--amber)',Telefon:'var(--violet)'};
+  const chBg     = {LinkedIn:'var(--blue-lt)',Email:'var(--amber-lt)',Telefon:'var(--violet-lt)'};
+  const chIcon   = {LinkedIn:'ic-linkedin',Email:'ic-mail',Telefon:'ic-phone'};
+
+  // ── Streak: consecutive days with activity ──
+  let streak = 0;
+  const checkDay = new Date();
+  for(let i=0;i<60;i++) {
+    const ds = checkDay.toISOString().slice(0,10);
+    const hasActivity = recentLogs.some(n=>n.date===ds);
+    if(hasActivity) { streak++; checkDay.setDate(checkDay.getDate()-1); }
+    else if(i===0) { checkDay.setDate(checkDay.getDate()-1); } // allow today to be empty
+    else break;
+  }
+  const quotes = [
+    'Jeder Nein bringt dich näher an das nächste Ja.',
+    'Ausdauer ist die Mutter des Erfolgs.',
+    'Der beste Moment zu handeln ist jetzt.',
+    'Kontakte sind Kapital — investiere täglich.',
+    'Wer fragt, gewinnt. Wer nachfasst, gewinnt öfter.',
+    'Kleine Schritte täglich führen zu großen Ergebnissen.',
+  ];
+  const quote = quotes[new Date().getDate() % quotes.length];
+
+  // ── Render ──
+  document.getElementById('dashWrap').innerHTML = `
+    <div class="dash-header">
+      <div>
+        <div class="dash-title">Dashboard</div>
+        <div class="dash-sub">${curMonthName} ${thisYear} — Übersicht deiner Vertriebsperformance</div>
+      </div>
+      <button class="btn btn-ghost" onclick="editGoals()" style="flex-shrink:0">
+        <svg width="13" height="13"><use href="#ic-settings"/></svg> Ziele anpassen
+      </button>
+    </div>
+
+    <!-- KPI ROW -->
+    <div class="dash-kpi-row">
+      <div class="kpi-card">
+        <div class="kpi-lbl">Kontakte diesen Monat</div>
+        <div class="kpi-val">${kontakteThisMonth}</div>
+        ${trendBadge(kontakteTrend)}
+        ${goalBar(kontakteThisMonth, goals.kontakteMonat, 'var(--accent)')}
+      </div>
+      <div class="kpi-card blue">
+        <div class="kpi-lbl">Erstkontakte ${curMonthName}</div>
+        <div class="kpi-val">${erstkontakteThis}</div>
+        ${trendBadge(erstkontakteLast?Math.round((erstkontakteThis-erstkontakteLast)/erstkontakteLast*100):null)}
+        ${goalBar(erstkontakteThis, goals.erstkontakteMonat, 'var(--blue)')}
+      </div>
+      <div class="kpi-card amber">
+        <div class="kpi-lbl">Aktivitäten ${curMonthName}</div>
+        <div class="kpi-val">${followUpsThis}</div>
+        ${trendBadge(followUpsTrend)}
+        ${goalBar(followUpsThis, goals.followUpsMonat, 'var(--amber)')}
+      </div>
+      <div class="kpi-card violet">
+        <div class="kpi-lbl">Angebote offen</div>
+        <div class="kpi-val">${angeboteThis}</div>
+        ${goalBar(angeboteThis, goals.angeboteMonat, 'var(--violet)')}
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-lbl">Conversion Rate</div>
+        <div class="kpi-val">${cr}<span style="font-size:18px;color:var(--text2)">%</span></div>
+        <span class="kpi-sub ${cr>=20?'up':cr<10?'down':''}">${gewonnenThis} von ${all.length} Kontakten</span>
+        ${avgDays!==null?`<div class="kpi-sub" style="margin-top:2px">Ø ${avgDays} Tage bis Abschluss</div>`:''}
+      </div>
+    </div>
+
+    <!-- MAIN GRID -->
+    <div class="dash-grid">
+
+      <!-- Activity Feed -->
+      <div class="dash-card">
+        <div class="dash-card-hd">
+          <div class="dash-card-title">Letzte Aktivitäten</div>
+          <button class="btn btn-ghost" style="padding:4px 10px;font-size:11.5px" onclick="showView('contacts')">Alle →</button>
+        </div>
+        <div class="dash-card-body">
+          <div class="act-feed">${feedItems}</div>
+        </div>
+      </div>
+
+      <!-- Next Actions -->
+      <div class="dash-card">
+        <div class="dash-card-hd">
+          <div class="dash-card-title">Nächste Aktionen fällig</div>
+          <span style="font-size:11px;color:var(--text3)">${dueContacts.length} ausstehend</span>
+        </div>
+        <div class="dash-card-body">
+          <div class="next-actions-list">${dueItems}</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="dash-grid three">
+
+      <!-- Pipeline Funnel -->
+      <div class="dash-card">
+        <div class="dash-card-hd"><div class="dash-card-title">Pipeline</div></div>
+        <div class="dash-card-body">
+          <div class="mini-funnel">
+            ${['neu','kontaktiert','antwort','qualifiziert','angebot','gewonnen','verloren'].map(s=>{
+              const cnt=all.filter(c=>c.status===s).length;
+              const mx=Math.max(all.length,1);
+              const stC={neu:'var(--text3)',kontaktiert:'var(--blue)',antwort:'var(--amber)',qualifiziert:'var(--accent)',angebot:'var(--violet)',gewonnen:'var(--teal)',verloren:'var(--red)'};
+              return `<div class="mini-fn">
+                <div class="mini-fn-lbl">${ST_LBL[s]}</div>
+                <div class="mini-fn-track"><div class="mini-fn-fill" style="width:${cnt/mx*100}%;background:${stC[s]}"></div></div>
+                <div class="mini-fn-cnt">${cnt}</div>
+              </div>`;
+            }).join('')}
+          </div>
+        </div>
+      </div>
+
+      <!-- Channel Performance -->
+      <div class="dash-card">
+        <div class="dash-card-hd"><div class="dash-card-title">Kanäle</div></div>
+        <div class="dash-card-body">
+          <div class="ch-perf">
+            ${chStats.map(({ch,cnt,won,cr,logs})=>`
+            <div class="ch-perf-item">
+              <div class="ch-perf-icon" style="background:${chBg[ch]};color:${chColors[ch]}">
+                <svg width="14" height="14"><use href="#${chIcon[ch]}"/></svg>
+              </div>
+              <div class="ch-perf-info">
+                <div class="ch-perf-name">${ch}</div>
+                <div class="ch-perf-bar-wrap">
+                  <div class="ch-perf-bar" style="width:${cnt/maxChCnt*100}%;background:${chColors[ch]}"></div>
+                </div>
+              </div>
+              <div class="ch-perf-stat">
+                <div class="ch-perf-num">${cnt}</div>
+                <div class="ch-perf-sub">${cr}% CR</div>
+              </div>
+            </div>`).join('')}
+            <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">
+              <div style="font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:0.6px;color:var(--text3);margin-bottom:8px">Logs ${curMonthName}</div>
+              ${chStats.map(({ch,logs})=>`
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+                <span style="font-size:12px;color:var(--text2)">${ch}</span>
+                <span style="font-family:'Geist Mono',monospace;font-size:12px;font-weight:700;color:${chColors[ch]}">${logs}</span>
+              </div>`).join('')}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Motivation & Streak -->
+      <div class="dash-card motivation-card">
+        <div class="dash-card-hd"><div class="dash-card-title">Aktivitätsserie</div></div>
+        <div class="dash-card-body">
+          <div class="motivation-num">${streak}</div>
+          <div class="motivation-sub">Tag${streak!==1?'e':''} in Folge aktiv</div>
+          <div class="motivation-quote">"${quote}"</div>
+          <div style="margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.15)">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+              <div style="text-align:center">
+                <div style="font-family:'Instrument Serif',serif;font-size:24px;color:#fff">${all.filter(c=>c.status==='gewonnen').length}</div>
+                <div style="font-size:11px;color:rgba(255,255,255,0.6)">Gewonnen gesamt</div>
+              </div>
+              <div style="text-align:center">
+                <div style="font-family:'Instrument Serif',serif;font-size:24px;color:#fff">${all.filter(c=>!['gewonnen','verloren'].includes(c.status)).length}</div>
+                <div style="font-size:11px;color:rgba(255,255,255,0.6)">Aktiv in Pipeline</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Monthly Activity Chart -->
+    <div class="dash-card" style="margin-bottom:20px">
+      <div class="dash-card-hd">
+        <div class="dash-card-title">Aktivität der letzten 6 Monate</div>
+        <div style="display:flex;gap:14px;align-items:center">
+          <div style="display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--text3)"><div style="width:10px;height:10px;border-radius:2px;background:var(--accent)"></div>Kontaktiert</div>
+          <div style="display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--text3)"><div style="width:10px;height:10px;border-radius:2px;background:var(--blue-lt);border:1px solid var(--blue-md)"></div>Neu</div>
+        </div>
+      </div>
+      <div class="dash-card-body">
+        <div class="month-chart">
+          ${chartData.map(d=>`
+          <div class="month-bar-wrap">
+            <div class="month-bar" style="height:${Math.max(d.kontakte/chartMax*100,d.kontakte?4:0)}%;background:var(--accent)" title="${d.kontakte} kontaktiert"></div>
+            <div class="month-bar" style="height:${Math.max(d.neu/chartMax*100,d.neu?4:0)}%;background:var(--blue-lt);border:1px solid var(--blue-md)" title="${d.neu} neu"></div>
+            <div class="month-lbl">${d.lbl}</div>
+          </div>`).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function editGoals() {
+  const goals = settings.goals || DEFAULT_SETTINGS.goals;
+  const goalDefs = [
+    { key:'kontakteMonat',     label:'Kontakte gesamt / Monat' },
+    { key:'erstkontakteMonat', label:'Erstkontakte / Monat' },
+    { key:'followUpsMonat',    label:'Aktivitäten / Monat' },
+    { key:'angeboteMonat',     label:'Angebote / Monat' },
+    { key:'gewonnenMonat',     label:'Gewonnen / Monat' },
+  ];
+  // Reuse confirm overlay as a simple goal editor
+  document.getElementById('confirmTitle').textContent = 'Monatsziele anpassen';
+  document.getElementById('confirmMsg').innerHTML = `
+    <div style="padding-top:4px">
+      ${goalDefs.map(g=>`
+      <div class="goal-edit-row">
+        <label>${g.label}</label>
+        <input type="number" min="0" max="999" id="g-${g.key}" value="${goals[g.key]||0}">
+      </div>`).join('')}
+    </div>`;
+  document.getElementById('confirmOkBtn').textContent = 'Speichern';
+  document.getElementById('confirmOkBtn').className = 'btn btn-primary';
+  _confirmCallback = () => {
+    if(!settings.goals) settings.goals = {};
+    goalDefs.forEach(g=>{
+      const v = parseInt(document.getElementById('g-'+g.key)?.value||'0');
+      settings.goals[g.key] = isNaN(v)||v<0 ? 0 : v;
+    });
+    persistSettings();
+    renderDashboard();
+    notify('Ziele gespeichert ✓','ok');
+  };
+  document.getElementById('confirmOverlay').classList.add('open');
+}
+// ── ARBEITSFENSTER ────────────────────────────────────────────
+let _wbOwnerFilter = 'alle';
+
+function renderWorkbench() {
+  const now   = new Date();
+  const todayStr = today();
+  const weekEnd = new Date(now);
+  weekEnd.setDate(now.getDate() + (7 - (now.getDay()||7)));
+  const weekEndStr = weekEnd.toISOString().slice(0,10);
+  const users = settings?.users || [{name:'Christian'},{name:'Partner'}];
+  const ownerF = _wbOwnerFilter;
+
+  function filterOwner(c) { return ownerF==='alle'||c.owner===ownerF; }
+  function lastLogEntry(c) { return (c.notizen||[]).find(n=>['linkedin','email','telefon','meeting'].includes(n.type)); }
+  function daysSince(dateStr) { if(!dateStr)return null; return Math.floor((now-new Date(dateStr))/86400000); }
+
+  const active = contacts.filter(c=>!['gewonnen','verloren'].includes(c.status));
+  const overdue      = active.filter(c=>filterOwner(c)&&c.nextAction&&c.nextAction<todayStr).sort((a,b)=>new Date(a.nextAction)-new Date(b.nextAction));
+  const dueToday     = active.filter(c=>filterOwner(c)&&c.nextAction===todayStr).sort((a,b)=>fullName(a).localeCompare(fullName(b)));
+  const dueWeek      = active.filter(c=>filterOwner(c)&&c.nextAction&&c.nextAction>todayStr&&c.nextAction<=weekEndStr).sort((a,b)=>new Date(a.nextAction)-new Date(b.nextAction));
+  const neverContacted = contacts.filter(c=>filterOwner(c)&&c.status==='neu'&&!(c.notizen||[]).some(n=>['linkedin','email','telefon','meeting'].includes(n.type))).sort((a,b)=>new Date(a.createdAt||0)-new Date(b.createdAt||0));
+  const stale        = active.filter(c=>!filterOwner(c)?false:!c.nextAction&&c.status!=='neu'&&daysSince(c.lastContact)>=14).sort((a,b)=>daysSince(b.lastContact)-daysSince(a.lastContact));
+
+  const totalTasks = overdue.length+dueToday.length+dueWeek.length+neverContacted.length+stale.length;
+
+  function buildCard(c, urgencyKey) {
+    const [bg,fg]=avc(c);
+    const last=lastLogEntry(c);
+    const lastCh=LOG_CHANNELS.find(ch=>ch.key===last?.type);
+    const urgencyLabels={
+      overdue:`Überfällig seit ${fmt(c.nextAction)}`,
+      today:'Heute fällig',
+      week:`Fällig ${fmt(c.nextAction)}`,
+      new:`Neu · ${fmt(c.createdAt)}`,
+      stale:`${daysSince(c.lastContact)} Tage ohne Aktivität`,
+    };
+    const urgCls=urgencyKey==='overdue'?'overdue':urgencyKey==='today'?'today':urgencyKey==='week'?'week':'new';
+    const lastLogHtml=last
+      ?`<div class="wb-last-log"><svg width="11" height="11" color="${lastCh?.key==='linkedin'?'var(--blue)':lastCh?.key==='email'?'var(--amber)':'var(--violet)'}"><use href="#${LOG_ICONS[last.type]||'ic-note'}"/></svg>Zuletzt: ${lastCh?.label||last.type}${last.outcome?' · '+last.outcome:''} am ${fmt(last.date)}</div>`
+      :`<div class="wb-last-log" style="color:var(--red)"><svg width="11" height="11"><use href="#ic-warning"/></svg>Noch nie kontaktiert</div>`;
+    return `<div class="wb-card ${urgCls}" onclick="openDetail('${c.id}')">
+      <div class="wb-card-badge"><span class="wb-urgency ${urgCls}">${urgencyLabels[urgencyKey]}</span></div>
+      <div class="wb-card-top">
+        <div class="wb-card-av" style="background:${bg};color:${fg};border-color:${bg}">${ini(c)}</div>
+        <div style="flex:1;min-width:0;padding-right:10px">
+          <div class="wb-card-name">${c.nachname||''} ${c.vorname||c.name||''}</div>
+          <div class="wb-card-sub">${c.firma||'—'}${c.position?' · '+c.position:''}</div>
+        </div>
+      </div>
+      <div class="wb-card-meta">
+        <span class="st-badge ${ST_CLS[c.status]||''}" style="font-size:11px">${ST_LBL[c.status]||c.status}</span>
+        ${(c.tags||[]).slice(0,2).map(t=>`<span class="tag">${t}</span>`).join('')}
+        <div class="own-chip" style="margin-left:auto"><div class="own-dot" style="${ownerDotStyle(c.owner)};width:16px;height:16px;font-size:8px">${c.owner[0]}</div><span style="font-size:11px">${c.owner}</span></div>
+      </div>
+      ${lastLogHtml}
+      <div class="wb-card-actions" onclick="event.stopPropagation()">
+        <button class="wb-btn primary" onclick="openQuickAction('${c.id}',event)"><svg width="12" height="12"><use href="#ic-send"/></svg> Aktion</button>
+        <button class="wb-btn" onclick="openDetail('${c.id}');switchToActivityTab()"><svg width="12" height="12"><use href="#ic-note"/></svg> Protokoll</button>
+        <button class="wb-btn" onclick="openEdit('${c.id}')"><svg width="12" height="12"><use href="#ic-edit"/></svg> Bearbeiten</button>
+      </div>
+    </div>`;
+  }
+
+  function section(title,icon,iconBg,iconColor,items,urgencyKey,emptyMsg) {
+    return `<div class="wb-section">
+      <div class="wb-section-hd">
+        <div class="wb-section-icon" style="background:${iconBg};color:${iconColor}"><svg width="15" height="15"><use href="#${icon}"/></svg></div>
+        <div class="wb-section-title">${title}</div>
+        <span class="wb-section-count" style="background:${iconBg};color:${iconColor}">${items.length}</span>
+      </div>
+      ${items.length?`<div class="wb-cards">${items.map(c=>buildCard(c,urgencyKey)).join('')}</div>`:`<div class="wb-empty"><svg width="14" height="14"><use href="#ic-check-circle"/></svg>${emptyMsg}</div>`}
+    </div>`;
+  }
+
+  const ownerTabs=`<div class="wb-filter-tabs">
+    ${[{key:'alle',label:'Alle'},...users.map(u=>({key:u.name,label:u.name}))].map(o=>
+      `<button class="wb-tab ${ownerF===o.key?'active':''}" onclick="setWbOwner('${o.key}')">${o.label}</button>`
+    ).join('')}
+  </div>`;
+
+  document.getElementById('workbenchWrap').innerHTML = `
+    <div class="wb-header">
+      <div>
+        <div class="wb-title">Arbeitsfenster</div>
+        <div class="wb-sub">${new Date().toLocaleDateString('de-DE',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div>
+      </div>
+      <div class="wb-stats">
+        <div class="wb-stat"><div class="wb-stat-n" style="color:var(--red)">${overdue.length}</div><div class="wb-stat-l">Überfällig</div></div>
+        <div class="wb-stat"><div class="wb-stat-n" style="color:var(--amber)">${dueToday.length}</div><div class="wb-stat-l">Heute</div></div>
+        <div class="wb-stat"><div class="wb-stat-n" style="color:var(--accent)">${dueWeek.length}</div><div class="wb-stat-l">Diese Woche</div></div>
+        <div class="wb-stat"><div class="wb-stat-n" style="color:var(--blue)">${neverContacted.length}</div><div class="wb-stat-l">Nie kontaktiert</div></div>
+        <div class="wb-stat"><div class="wb-stat-n" style="color:var(--text3)">${stale.length}</div><div class="wb-stat-l">Eingeschlafen</div></div>
+      </div>
+    </div>
+    ${ownerTabs}
+    ${totalTasks===0
+      ?`<div style="text-align:center;padding:60px 20px;color:var(--text3)">
+          <svg width="48" height="48" style="opacity:0.2;margin-bottom:12px;display:block;margin-left:auto;margin-right:auto"><use href="#ic-check-circle"/></svg>
+          <div style="font-family:'Instrument Serif',serif;font-size:20px;color:var(--text2);margin-bottom:6px">Alles erledigt!</div>
+          <div style="font-size:13px">Keine offenen Aufgaben für diese Woche.</div>
+        </div>`
+      :`${overdue.length?section('Überfällig','ic-warning','var(--red-lt)','var(--red)',overdue,'overdue','Keine überfälligen Wiedervorlagen – super!'):''}
+       ${section('Heute fällig','ic-clock','var(--amber-lt)','var(--amber)',dueToday,'today','Heute nichts fällig.')}
+       ${section('Diese Woche fällig','ic-calendar','var(--accent-lt)','var(--accent)',dueWeek,'week','Diese Woche keine weiteren Wiedervorlagen.')}
+       ${section('Nie kontaktiert','ic-send','var(--blue-lt)','var(--blue)',neverContacted,'new','Alle Kontakte wurden bereits angeschrieben.')}
+       ${stale.length?section('Eingeschlafen (>14 Tage)','ic-restore','var(--surface3)','var(--text3)',stale,'stale','Keine eingeschlafenen Kontakte.'):''}
+      `}
+  `;
+}
+
+function setWbOwner(owner) { _wbOwnerFilter=owner; renderWorkbench(); }
+
 function notify(msg,type=''){const el=document.getElementById('notif');el.textContent=msg;el.className='notif show '+type;clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),2500);}
 
 // ── INIT ──────────────────────────────────────────────────────
